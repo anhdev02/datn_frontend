@@ -10,13 +10,17 @@ import '../assets/scss/xans_myshop_asyncbenefit.scss'
 import '../assets/scss/displaynone_632.scss'
 import '../assets/scss/xans_myshop_asyncbenefit_8741.scss'
 import HeaderAccountRes from '../common/HeaderAccountRes'
+import { useEffect } from 'react'
 const AccountPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Tài khoản';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_myshop_asyncbenefit_8741'>
         <div id="container">
-            <HeaderAccountRes/>
+            <HeaderAccountRes title="Tài khoản"/>
             <AccountRes/>
             <FooterRes/>
         </div>

@@ -1,159 +1,336 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
-const HeaderBlogRes = () => {
+const HeaderBlogRes = (props) => {
+  const [showSearch, setShowSearch] = useState(false);
+  const [search, setSearch] = useState();
+  const [isActive, setIsActive] = useState(false);
+  const [logout, setLogout] = useState(false);
+  const [categoryParent, setCategoryParent] = useState([]);
+  const [allCategory, setAllCategory] = useState([]);
+  const [categoryState, setCategoryState] = useState({});
+  const numberCart = useSelector((state) => state.cart.carts.length);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/category/parentR/0")
+      .then((res) => res.json())
+      .then((data) => setCategoryParent(data))
+      .catch((err) => console.log(err));
+
+    fetch("http://localhost:8080/api/category/all")
+      .then((res) => res.json())
+      .then((data) => setAllCategory(data))
+      .catch((err) => console.log(err));
+  }, [location]);
+
+  const ShowSearch = (e) => {
+    e.preventDefault();
+    setShowSearch(!showSearch);
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    navigate(`/search?search=${search.toLowerCase().replace(/\s/g, "-")}`);
+  };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    setIsActive(!isActive);
+  };
+
+  const Logout = (event) => {
+    event.preventDefault();
+    if (localStorage.getItem("accessToken") !== "google_token_access") {
+      localStorage.removeItem("username");
+      localStorage.removeItem("id");
+      localStorage.removeItem("email");
+      localStorage.removeItem("phone");
+      localStorage.removeItem("role");
+    }
+    localStorage.removeItem("accessToken");
+    setLogout(true);
+  };
+
+  function Show() {
+    if (localStorage.getItem("accessToken") !== null) {
+      return (
+        <>
+          <p className="xans-element- xans-layout xans-layout-statelogon member ">
+            Xin Chào
+            <Link to="/account">
+              <strong>
+                <span className="xans-member-var-name">
+                  {` ${localStorage.getItem("username")}`}
+                </span>
+              </strong>
+            </Link>
+            <Link to="" onClick={Logout} className="slide-logout">
+              Đăng Xuất
+            </Link>
+          </p>
+          <div>
+            <ul className="xans-element- xans-layout xans-layout-statelogon asidetop asidetop2 ">
+              <li>
+                {" "}
+                <Link to="/account">
+                  <img
+                    src="http://localhost:3000/assets/imgs/aside_join.png"
+                    alt=""
+                  />
+                  Tài khoản của tôi
+                </Link>
+              </li>
+              <li className="xans-element- xans-layout xans-layout-orderbasketcount ">
+                <Link to="/cart" className="btnBasket">
+                  <img
+                    src="http://localhost:3000/assets/imgs/aside_cart.png"
+                    alt=""
+                  />
+                  <span className="count EC-Layout_Basket-count-display">
+                    <span className="EC-Layout-Basket-count">{numberCart}</span>
+                  </span>
+                  Giỏ hàng
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <p className="xans-element- xans-layout xans-layout-statelogoff member ">
+            <Link to="/register">
+              <strong>Đăng Ký </strong>(Bạn chưa đăng nhập.)
+            </Link>
+          </p>
+          <div>
+            <ul className="xans-element- xans-layout xans-layout-statelogoff asidetop asidetop3 ">
+              <li>
+                <Link to="/login">
+                  <img
+                    src="http://localhost:3000/assets/imgs/aside_join.png"
+                    alt=""
+                  />
+                  Đăng Nhập
+                </Link>
+              </li>
+              <li className="xans-element- xans-layout xans-layout-orderbasketcount ">
+                <Link to="/cart" className="btnBasket">
+                  <img
+                    src="http://localhost:3000/assets/imgs/aside_cart.png"
+                    alt=""
+                  />
+                  <span className="count EC-Layout_Basket-count-display">
+                    <span className="EC-Layout-Basket-count">{numberCart}</span>
+                  </span>
+                </Link>
+                Giỏ hàng
+              </li>
+            </ul>
+          </div>
+        </>
+      );
+    }
+  }
+
+  const handleClickChild = (e, id) => {
+    e.preventDefault();
+    setCategoryState((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
+  };
+
+  if (logout === true) {
+    return <Navigate to="/login" />;
+  }
+
   return (
-    <header id="header">
-      <div className="header sub-header">
-        <h1 className="sub-h1">
-          <span className="headcategory-span" />
-          <a className="headcategory-top" href="#st">
-            Story
-          </a>
+    <>
+      <aside
+        id="aside"
+        className={`xans-layout xans-layout-slidepackage ${
+          isActive ? "" : "displaynone"
+        }`}
+        style={{ zIndex: 24, visibility: "visible", background: "#fff" }}
+      >
+        <h1>
+          <Link to="/">
+            <img
+              src="http://localhost:3000/assets/imgs/logo.png"
+              alt="LocknLock"
+            />
+          </Link>
         </h1>
-        <div className="xans-element- xans-layout xans-layout-category sub-top-menu">
-          <ul className="clearBoth">
-            <li className="xans-record-">
-              <a
-                className="menu-a2"
-                href="/category/bình-giữ-nhiệt-bình-nước/24/"
-              >
-                Bình giữ nhiệt / Bình nước
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/hộp-bảo-quản/25/">
-                Hộp bảo quản
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/Điện-gia-dụng/23/">
-                Điện gia dụng
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/Đồ-dùng-nhà-bếp/26/">
-                Đồ dùng nhà bếp
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/Đồ-dùng-sinh-hoạt/27/">
-                Đồ dùng sinh hoạt
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/locknlock-tv/108/">
-                LocknLock TV
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a
-                className="menu-a2"
-                href="/category/hưỡng-dẫn-sử-dụng-sản-phẩm/52/"
-              >
-                Hưỡng dẫn sử dụng sản phẩm
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/recipe/68/">
-                Recipe
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/recipe/57/">
-                Recipe
-              </a>
-            </li>
-            <li className="xans-record-">
-              <a className="menu-a2" href="/category/giảm-giá/64/">
-                Giảm giá
-              </a>
-            </li>
+        {Show()}
+        <div id="slideCateList" className="categoryCont">
+          <ul className="xans-layout xans-layout-category categoryList">
+            {categoryParent.map((category, index) => (
+              <li key={index} id={`cate${category.id}`}>
+                <Link
+                  onClick={(e) => handleClickChild(e, category.id)}
+                  to=""
+                  className="cate"
+                >
+                  {category.categoryName}
+                </Link>
+                <Link
+                  to={`/productbycategoryparent/${
+                    category.id
+                  }?name=${category.categoryName
+                    .toLowerCase()
+                    .replace(/\s/g, "-")}`}
+                  className="view"
+                >
+                  Xem Sản Phẩm
+                </Link>
+                <ul
+                  class={`slideSubMenu ${
+                    categoryState[category.id] ? "" : "displaynone"
+                  }`}
+                >
+                  {allCategory.map(
+                    (categoryChild) =>
+                      categoryChild.parent === category.id && (
+                        <li>
+                          <Link
+                            to={`/productbycategory/${
+                              categoryChild.id
+                            }?name=${categoryChild.categoryName
+                              .toLowerCase()
+                              .replace(/\s/g, "-")}`}
+                            class="cate"
+                          >
+                            {categoryChild.categoryName}
+                          </Link>
+                        </li>
+                      )
+                  )}
+                </ul>
+              </li>
+            ))}
           </ul>
+          <div className="aside-sub-menu">
+            <ul>
+              <li>
+                <Link to="/dealhot">Deal Hot</Link>
+              </li>
+              <li>
+                <Link to="/bestseller">Hàng bán chạy</Link>
+              </li>
+              <li>
+                <Link to="/newproducts">Hàng mới</Link>
+              </li>
+              <li>
+                <Link to="/story">Story</Link>
+              </li>
+              <li>
+                <Link to="/stores">Stores</Link>
+              </li>
+            </ul>
+          </div>
+          <div className="aside-sub-menu">
+            <ul>
+              <li>
+                <Link to="/customercare">
+                  <strong>Chăm sóc khách hàng</strong>
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="xans-element- xans-layout xans-layout-mobileaction go-back">
-          <a href="#none" onclick="history.go(-1);return false;">
-            back
-          </a>
+        <div className="xans-element- xans-myshop xans-myshop-main ">
+          <Link to="/favouriteslist" className="wishList">
+            Yêu Thích
+          </Link>
+          <Link to="/seen" className="recentList">
+            Đã Xem
+          </Link>
+          <Link to="/order" className="orderList">
+            Đơn hàng
+          </Link>
         </div>
-        <div className="category">
-          <a href="#none" className="fold">
-            Danh Mục
-          </a>
-        </div>
-        <div className="search">
-          <Link to="/search">search</Link>
-        </div>
-        <div className="header-MyPage">
-          <a href="/myshop/index.html">My page</a>
-        </div>
-        <section id="topArea">
-          <nav id="mainMenu">
-            <div id="mainMenuIn" className="swiper-container swiper-container0">
-              <ul className="swiper-wrapper">
-                <li className="swiper-slide my_li0 actdisplaynone">
-                  <a className="my_a" href="/story.html">
-                    Tất cả
-                  </a>
-                </li>
-                <li className="swiper-slide my_li1">
-                  <a href="/category/t%E1%BA%A5t-c%E1%BA%A3/105/">Recipe</a>
-                </li>
-                <li className="swiper-slide my_li2">
-                  <a
-                    className="my_a"
-                    href="/Airfryer/LocknLockTV.html?cate_no=108"
-                  >
-                    LocknLock TV
-                  </a>
-                </li>
-                <li className="swiper-slide my_li3">
-                  <a href="/Airfryer/RecipeBook.html?cate_no=52">
-                    Hướng dẫn sử dụng
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="swiper-scrollbar" />
-          </nav>
-        </section>
-      </div>
-      <div className="searchWrap">
-        <form
-          id="searchBarForm"
-          name
-          action="/product/search.html"
-          method="get"
-          target="_self"
-          encType="multipart/form-data"
-        >
-          <input
-            id="banner_action"
-            name="banner_action"
-            defaultValue
-            type="hidden"
+        <Link onClick={handleClick} to="" className="btnClose">
+          <img
+            src="http://localhost:3000/assets/imgs/m-close.png"
+            width={16}
+            alt="Close"
           />
-          <div className="xans-element- xans-layout xans-layout-searchheader">
-            <div className="searchForm">
-              <input
-                id="keyword"
-                name="keyword"
-                className="inputTypeText"
-                placeholder
-                defaultValue
-                type="text"
-              />
-              <button type="button" className="btnDelete">
-                Xoá
-              </button>
-              <div className="autoList" id>
-                <ul className="autoDrop" id />
+        </Link>
+      </aside>
+      <header id="header">
+        <div className="header sub-header">
+          <h1 className="sub-h1">
+            <span className="headcategory-span" />
+            <Link className="headcategory-top" to="">
+              {props.title}
+            </Link>
+          </h1>
+          <div className="category">
+            <Link onClick={handleClick} to="" className="fold">
+              Danh Mục
+            </Link>
+          </div>
+          <div className="search">
+            <Link onClick={ShowSearch} to="/search">search</Link>
+          </div>
+          <div className="header-MyPage">
+            <Link to="/account">My page</Link>
+          </div>
+
+          <section id="topArea">
+            <nav id="mainMenu">
+              <div id="mainMenuIn" className="swiper-container swiper-container0">
+                <ul className="swiper-wrapper">
+                  <li className="swiper-slide my_li0">
+                    <Link to="/story">Tất cả</Link>
+                  </li>
+                  <li className="swiper-slide my_li1">
+                    <Link to="/recipe">Recipe</Link>
+                  </li>
+                  <li className="swiper-slide my_li2">
+                    <Link to="/locknlocktv">
+                      LocknLock TV
+                    </Link>
+                  </li>
+                  <li className="swiper-slide my_li3">
+                    <Link to="/productguide">
+                      Hướng dẫn sử dụng
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="swiper-scrollbar" />
+            </nav>
+          </section>
+        </div>
+
+
+        <div className={showSearch ? `searchWrap` : `searchWrap displaynone`}>
+          <form
+            id="searchBarForm"
+            onSubmit={handleSearch}
+          >
+            <div className="xans-element- xans-layout xans-layout-searchheader">
+              <div className="searchForm">
+                <input
+                  id="keyword"
+                  name="keyword"
+                  className="inputTypeText"
+                  type="search"
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
             </div>
-          </div>
-        </form>
-      </div>
-    </header>
+          </form>
+        </div>
+      </header>
+    </>
   );
 };
 

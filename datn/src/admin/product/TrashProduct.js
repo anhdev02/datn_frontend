@@ -1,24 +1,25 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { confirm } from "react-confirm-box";
 
 const TrashProduct = () => {
-  var url = "http://localhost:8080/api/product/trash"
   const [product, setProduct] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
-  useEffect(()=>{
-    axios.get(url)
-    .then(res=>{
-      setProduct(res.data)
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-  }, [isDeleted]);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch("http://localhost:8080/api/product/trash")
+      .then((res) => res.json())
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -37,16 +38,21 @@ const TrashProduct = () => {
   const renderPageNumbers = pageNumbers.map((number) => {
     const activeClass = number === currentPage ? "active" : "";
     return (
-        <li className={`page-item ${activeClass}`} style={{display: "inline-block"}}>
-          <a onClick={handleClick} id={number} className="page-link" href="#st">{number}</a>
-        </li>
+      <li
+        className={`page-item ${activeClass}`}
+        style={{ display: "inline-block" }}
+      >
+        <a onClick={handleClick} id={number} className="page-link" href="#st">
+          {number}
+        </a>
+      </li>
     );
   });
 
   function addTrash(event) {
     event.preventDefault();
     var id = event.target.id;
-    var url = "http://localhost:8080/api/product/" + id
+    var url = "http://localhost:8080/api/product/" + id;
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -64,41 +70,44 @@ const TrashProduct = () => {
 
     fetch(url, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        console.log(result);
+        toast.success("Sản phẩm đã được khôi phục!", { position: "top-right" });
+        loadData();
+      })
       .catch((error) => console.log("error", error));
-      toast.success("Sản phẩm đã được khôi phục!", { position: "top-right" });
-      setIsDeleted(!isDeleted);
   }
   const Delete = async (event) => {
     event.preventDefault();
     const result = await confirm("Sản phẩm sẽ bị xóa vĩnh viễn?", event);
     if (result) {
       var id = event.target.id;
-      var url = "http://localhost:8080/api/product/" + id
+      var url = "http://localhost:8080/api/product/" + id;
       var requestOptions = {
-        method: 'DELETE',
-        redirect: 'follow'
+        method: "DELETE",
+        redirect: "follow",
       };
-      
+
       fetch(url, requestOptions)
-        .then(response => {
-          response.text()
-          if(response.ok){
+        .then((response) => {
+          response.text();
+          if (response.ok) {
             toast.success("Đã xóa vĩnh viễn sản phẩm!", {
               position: "top-right",
-            })
-          }else{
+            });
+          } else {
             toast.error("Xóa vĩnh viễn sản phẩm không thành công!", {
               position: "top-right",
-            })
+            });
           }
         })
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
-        setIsDeleted(!isDeleted);
+        .then((result) => {
+          console.log(result);
+          loadData();
+        })
+        .catch((error) => console.log("error", error));
     }
-    
-  }
+  };
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
       <h4 className="fw-bold py-3 mb-4">Sản phẩm</h4>
@@ -115,7 +124,7 @@ const TrashProduct = () => {
                 <th>Hình ảnh</th>
                 <th>Tên sản phẩm</th>
                 <th>Giá</th>
-                <th>Sales</th>
+                <th>Giảm giá</th>
                 <th>Mô tả</th>
                 <th>Hành động</th>
               </tr>
@@ -127,7 +136,11 @@ const TrashProduct = () => {
                     <tr key={index}>
                       <td>{item.id}</td>
                       <td>
-                        <img width={60} src={`../../assets/imgs/${item.image}`} />
+                        <img
+                          width={60}
+                          src={`../../assets/imgs/${item.image}`}
+                          alt=""
+                        />
                       </td>
                       <td>
                         <div style={{ width: "200px", marginTop: "2vh" }}>
@@ -142,7 +155,7 @@ const TrashProduct = () => {
                         </div>
                       </td>
                       <td>{item.price}</td>
-                      <td>{item.sales}</td>
+                      <td>{item.sale}%</td>
                       <td>
                         <div style={{ width: "200px", marginTop: "2vh" }}>
                           <p
@@ -151,7 +164,7 @@ const TrashProduct = () => {
                               textOverflow: "ellipsis",
                             }}
                           >
-                            {item.details}
+                            {item.detail}
                           </p>
                         </div>
                       </td>
@@ -191,8 +204,11 @@ const TrashProduct = () => {
           </table>
         </div>
       </div>
-      <nav aria-label="Page navigation" style={{textAlign: "center", marginTop: "10px"}}>
-        <ul className="pagination" style={{display: "inline-block"}}>
+      <nav
+        aria-label="Page navigation"
+        style={{ textAlign: "center", marginTop: "10px" }}
+      >
+        <ul className="pagination" style={{ display: "inline-block" }}>
           {renderPageNumbers}
         </ul>
       </nav>

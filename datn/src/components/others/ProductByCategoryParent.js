@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { AddCart } from '../../store/action/cart';
 import {store} from '../../store/store'
+import axios from "axios";
 
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -17,6 +18,8 @@ const ProductByCategoryParent = (props) => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [productFavorites, setProductFavorites] = useState([]);
+  const userId = localStorage.getItem("id");
   useEffect(() => {
     fetch(`http://localhost:8080/api/product/parentcategory/${props.id}`)
       .then((res) => res.json())
@@ -25,14 +28,23 @@ const ProductByCategoryParent = (props) => {
         setCurrentPage(1);
       })
       .catch((err) => console.log(err));
+
+      fetchFavoriteProducts();
   }, [location]);
+
+  const productIds = productFavorites.map((favorite) => favorite.productId);
+
+  const updatedProducts = products.map((product) => {
+    const icon_status = productIds.includes(product.id) ? "on" : "off";
+    return { ...product, icon_status };
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = updatedProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(products.length / itemsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(updatedProducts.length / itemsPerPage); i++) {
     pageNumbers.push(i);
   }
 
@@ -45,12 +57,73 @@ const ProductByCategoryParent = (props) => {
     const activeClass = number === currentPage ? "this" : "other";
     return (
       <li>
-        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+        <Link onClick={handleClick} id={number} to="" className={activeClass}>
           {number}
-        </a>
+        </Link>
       </li>
     );
   });
+
+  const fetchFavoriteProducts = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/favorite/user/${userId}`
+      );
+      setProductFavorites(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sản phẩm yêu thích:", error);
+    }
+  };
+
+  const handleImageClick = async (product) => {
+    if (product.icon_status === "on") {
+      removeFromFavorites(userId, product.id);
+    } else {
+      addToFavorites(userId, product.id);
+    }
+  };
+
+  const addToFavorites = async (userId, productId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/favorite/add",
+        {
+          userId: userId,
+          productId: productId,
+        }
+      );
+
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: 1,
+        }
+      );
+
+      const favoriteId = response.data.id;
+      fetchFavoriteProducts();
+      return favoriteId;
+    } catch (error) {
+      console.error("Lỗi khi thêm vào danh sách yêu thích:", error);
+    }
+  };
+
+  const removeFromFavorites = async (userId, productId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/favorite/${userId}/${productId}`
+      );
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: -1,
+        }
+      );
+      fetchFavoriteProducts();
+    } catch (error) {
+      console.error("Lỗi khi xóa khỏi danh sách yêu thích:", error);
+    }
+  };
 
   function addToCartClickHandle(id, name, image, price, sale, quantity) {
     if(quantity===0) {
@@ -114,16 +187,13 @@ const ProductByCategoryParent = (props) => {
                     <Link to="/">Trang Chủ</Link>
                   </li>
                   <li className="path_li path_li1">
-                    <a
+                    <Link
                       className="path-a"
-                      href="/category/bình-giữ-nhiệt-bình-nước/24/"
+                      to=""
                     >
                       {props.name}
-                    </a>
+                    </Link>
                   </li>
-                  <li className="path_li path_li2 displaynone"></li>
-                  <li className="path_li path_li3 displaynone"></li>
-                  <li className="path_li path_li4 displaynone"></li>
                 </ol>
               </div>
               <div className="xans-product xans-product-headcategory title">
@@ -154,28 +224,7 @@ const ProductByCategoryParent = (props) => {
                       <Link onClick={sortOrderFavorite} to="">Sản phẩm yêu thích</Link>
                     </li>
                   </ul>
-                  <span className="compare displaynone">
-                    <Link to="" className="btnCompare">
-                      So Sánh Sản Phẩm
-                    </Link>
-                  </span>
                 </div>
-                <fieldset className="condition displaynone">
-                  <legend>Tìm Nâng Cao</legend>
-                  <p>
-                    <select className="xans-product xans-product-firstselect FirstSelect">
-                      <option value>-Chọn Tiêu Chí-</option>
-                      <option value className />
-                    </select>
-                    <select className="xans-product xans-product-secondselect SecondSelect">
-                      <option value>-Chọn Tiêu Chí-</option>
-                      <option value className />
-                    </select>
-                    <Link to="/search" className="btnSubmit">
-                      Tìm Kiếm
-                    </Link>
-                  </p>
-                </fieldset>
               </div>
               <div className="xans-product xans-product-listnormal wrap-mProduct Product-list">
                 <ul className="prdList grid4">
@@ -218,14 +267,15 @@ const ProductByCategoryParent = (props) => {
                                   src="http://localhost:3000/assets/imgs/btn_wish_before.png"
                                   className="icon_img ec-product-listwishicon"
                                   alt="Trước đăng ký Sản phẩm yêu thích"
-                                  icon_status="off"
+                                  style={{ cursor: "pointer" }}
+                                  icon_status={product.icon_status}
+                                  onClick={() => handleImageClick(product)}
                                 />
                               </span>
                             </div>
                           </div>
                         </div>
                         <div className="description">
-                          <div className="color displaynone" />
                           <h4 className="name">
                             <Link
                               to={`/productdetail/${product.id}`}
@@ -290,54 +340,6 @@ const ProductByCategoryParent = (props) => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="/order/basket.html">3</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <ul>
-            <li className="displaynone xans-record-">
-              <a href="/product/detail.html##param##">
-                <img src="about:blank" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-            <li className="displaynone xans-record-">
-              <a href="/product/detail.html##param##">
-                <img src="about:blank" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-          </ul>
-          <p className="player">
-            <img
-              src="http://localhost:3000/assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="http://localhost:3000/assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <a href="#header" title="Back to Top">
-            <img
-              src="http://localhost:3000/assets/imgs/btn_top1.gif"
-              alt="Top"
-            />
-          </a>
-        </p>
       </div>
       <ToastContainer/>
     </div>

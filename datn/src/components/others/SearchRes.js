@@ -182,7 +182,7 @@ const SearchRes = (props) => {
         <div class="xans-search xans-search-result wrap-mProduct Product-list">
           <ul class="prdList grid4">
             {currentItems.map((product, index) => (
-              <li>
+              <li key={index}>
                 <div class="inner">
                   <div class="thumbnail">
                     <div class="prdImg">
@@ -214,12 +214,12 @@ const SearchRes = (props) => {
                   </div>
                   <div class="description">
                     <h4 class="name">
-                      <Link to={`/productdetail/${product.id}`} class="">
+                      <Link to={`/productdetail/${product.id}`}>
                         {product.productName}
                       </Link>
                     </h4>
                     <ul class="xans-search xans-search-listitem spec xans-product-listitem">
-                      <li class="xans-record-">
+                      <li >
                         <span
                           style={{
                             fontSize: "16px",
@@ -235,7 +235,7 @@ const SearchRes = (props) => {
                           style={{ textDecoration: "line-through" }}
                         ></span>
                       </li>
-                      <li class="xans-record-">
+                      <li >
                         <span
                           style={{
                             fontSize: "16px",

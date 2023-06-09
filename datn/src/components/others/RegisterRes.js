@@ -24,26 +24,28 @@ const RegisterRes = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      }).then((data)=> {
-        if (data.status) {
-          toast.success("Đăng ký thành công!", { position: "top-right" });
-          setTimeout(() => setLoggedIn({ loggedIn: data.status }), 2000);
-        } else {
-          toast.error(data.message, { position: "top-right" });
-        }
       })
-      .catch((error) => {
-        console.error("There was a problem with the network request:", error);
-        toast.error("Có lỗi xảy ra khi tạo người dùng!", {
-          position: "top-right",
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Network response was not ok.");
+          }
+        })
+        .then((data) => {
+          if (data.status) {
+            toast.success("Đăng ký thành công!", { position: "bottom-center" });
+            setTimeout(() => setLoggedIn({ loggedIn: data.status }), 2000);
+          } else {
+            toast.error(data.message, { position: "bottom-center" });
+          }
+        })
+        .catch((error) => {
+          console.error("There was a problem with the network request:", error);
+          toast.error("Có lỗi xảy ra khi tạo người dùng!", {
+            position: "bottom-center",
+          });
         });
-      });
     }
   }
 
@@ -58,6 +60,78 @@ const RegisterRes = () => {
             </div>
             <div className="ec-base-table typeWrite gClearBorderTop">
               <ul>
+                <li>
+                  <h3 id="nameTitle">
+                    Tên
+                    <img
+                      src="./assets/imgs/ico_required.png"
+                      width={7}
+                      height={7}
+                      alt="Required"
+                    />
+                  </h3>
+                  <div>
+                    <span id="nameContents">
+                      <input
+                        id="name"
+                        name="name"
+                        className="ec-member-name"
+                        maxLength={30}
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                      />
+                    </span>
+                    <p id="idMsg" />
+                  </div>
+                </li>
+                <li className="emailCheck">
+                  <h3>
+                    Địa Chỉ Email
+                    <img
+                      src="./assets/imgs/ico_required.png"
+                      width={7}
+                      height={7}
+                      alt="Required"
+                    />
+                  </h3>
+                  <div>
+                    <input
+                      id="email1"
+                      name="email1"
+                      type="email"
+                      value={email}
+                      required
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                </li>
+                <li>
+                  <h3>
+                    Điện Thoại
+                    <img
+                      src="./assets/imgs/ico_required.png"
+                      className
+                      width={7}
+                      height={7}
+                      alt="Required"
+                    />
+                  </h3>
+                  <div className="phone-td">
+                    <input
+                      id="phone2"
+                      name="phone[]"
+                      maxLength={15}
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Nhập 9 chữ số"
+                      required
+                      pattern="[0-9]{9}"
+                    />
+                  </div>
+                </li>
                 <li>
                   <h3>
                     Mật Khẩu
@@ -114,78 +188,6 @@ const RegisterRes = () => {
                       value={confirmpassword}
                       onChange={(e) => setConfirmpassword(e.target.value)}
                       required
-                    />
-                  </div>
-                </li>
-                <li className="emailCheck">
-                  <h3>
-                    Địa Chỉ Email
-                    <img
-                      src="./assets/imgs/ico_required.png"
-                      width={7}
-                      height={7}
-                      alt="Required"
-                    />
-                  </h3>
-                  <div>
-                    <input
-                      id="email1"
-                      name="email1"
-                      type="email"
-                      value={email}
-                      required
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                </li>
-                <li>
-                  <h3 id="nameTitle">
-                    Tên
-                    <img
-                      src="./assets/imgs/ico_required.png"
-                      width={7}
-                      height={7}
-                      alt="Required"
-                    />
-                  </h3>
-                  <div>
-                    <span id="nameContents">
-                      <input
-                        id="name"
-                        name="name"
-                        className="ec-member-name"
-                        maxLength={30}
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </span>
-                    <p id="idMsg" />
-                  </div>
-                </li>
-                <li>
-                  <h3>
-                    Điện Thoại
-                    <img
-                      src="./assets/imgs/ico_required.png"
-                      className
-                      width={7}
-                      height={7}
-                      alt="Required"
-                    />
-                  </h3>
-                  <div className="phone-td">
-                    <input
-                      id="phone2"
-                      name="phone[]"
-                      maxLength={15}
-                      type="text"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Nhập 9 chữ số"
-                      required
-                      pattern="[0-9]{9}"
                     />
                   </div>
                 </li>

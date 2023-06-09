@@ -11,6 +11,7 @@ import HeaderAccountRes from '../common/HeaderAccountRes'
 import SearchRes from '../others/SearchRes'
 import FooterRes from '../common/FooterRes'
 import { useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 
 
 const SearchPage = () => {
@@ -18,6 +19,9 @@ const SearchPage = () => {
   const queryParams=new URLSearchParams(location.search);
   const search=queryParams.get("search");
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Tìm kiếm';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_896 body_10301'>

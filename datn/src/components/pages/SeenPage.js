@@ -10,10 +10,14 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderProductRes from '../common/HeaderProductRes'
 import SeenRes from '../others/SeenRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 
 const SeenPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Sản phẩm đã xem';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_8525'>

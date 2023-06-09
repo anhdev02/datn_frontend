@@ -1,6 +1,12 @@
 import React from "react";
+import { useState } from "react";
 
 const StoresRes = () => {
+  const [activeTab, setActiveTab] = useState("mien_bac");
+
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+  };
   return (
     <div id="contents">
       <div class="root_width mobile_width">
@@ -17,12 +23,35 @@ const StoresRes = () => {
             </div>
             <div class="store_width_tab">
               <div class="store_tab">
-                <button class="store_tablinks">Miền Bắc</button>
-                <button class="store_tablinks">Miền Trung</button>
-                <button class="store_tablinks active">Miền Nam</button>
+                <button
+                  className={`store_tablinks ${
+                    activeTab === "mien_bac" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabClick("mien_bac")}
+                >
+                  Miền Bắc
+                </button>
+                <button
+                  className={`store_tablinks ${
+                    activeTab === "mien_trung" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabClick("mien_trung")}
+                >
+                  Miền Trung
+                </button>
+                <button
+                  className={`store_tablinks ${
+                    activeTab === "mien_nam" ? "active" : ""
+                  }`}
+                  onClick={() => handleTabClick("mien_nam")}
+                >
+                  Miền Nam
+                </button>
               </div>
 
-              <div id="mien_bac" class="store_tabcontent">
+              <div id="mien_bac" className={`store_tabcontent ${
+                      activeTab !== "mien_bac" ? "displaynone" : ""
+                    }`}>
                 <div>
                   <ul>
                     <li>
@@ -391,7 +420,9 @@ const StoresRes = () => {
                   </ul>
                 </div>
               </div>
-              <div id="mien_trung" class="store_tabcontent">
+              <div id="mien_trung" className={`store_tabcontent ${
+                      activeTab !== "mien_trung" ? "displaynone" : ""
+                    }`}>
                 <div>
                   <ul>
                     <li>
@@ -465,8 +496,9 @@ const StoresRes = () => {
               </div>
               <div
                 id="mien_nam"
-                class="store_tabcontent"
-                style={{ display: "block" }}
+                className={`store_tabcontent ${
+                  activeTab !== "mien_nam" ? "displaynone" : ""
+                }`}
               >
                 <div>
                   <ul>

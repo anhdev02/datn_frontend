@@ -7,6 +7,7 @@ import { confirm } from "react-confirm-box";
 
 const AccountInfo = () => {
   const id = localStorage.getItem("id");
+  const users = localStorage.getItem("username");
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [userName, setUserName] = useState();
@@ -14,12 +15,27 @@ const AccountInfo = () => {
   const [phone, setPhone] = useState();
   const [password, setPassword] = useState();
   const [passwordConfirm, setPasswordConfirm] = useState();
+  const [productFavorites, setProductFavorites] = useState([]);
+  const [orders, setOrders] = useState([]);
+
   useEffect(() => {
     fetch(`http://localhost:8080/api/user/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setUser(data);
         setUserName()
+      })
+      .catch((err) => console.log(err));
+
+      fetch(`http://localhost:8080/api/product/favorite/${id}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
+      .catch((err) => console.log(err));
+
+      fetch(`http://localhost:8080/api/order/user/${users}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -39,7 +55,7 @@ const AccountInfo = () => {
   const handleEditUser = (event) => {
     event.preventDefault();
     if (password !== passwordConfirm) {
-      toast.error("Mật khẩu không khớp!", { position: "top-right" });
+      toast.error("Mật khẩu không khớp!", { position: "bottom-left" });
     } else {
       var url = "http://localhost:8080/api/user/" + user.id;
       var myHeaders = new Headers();
@@ -73,17 +89,17 @@ const AccountInfo = () => {
       .then((data) => {
         if (data.status) {
           toast.success("Sửa người dùng thành công!", {
-            position: "top-right",
+            position: "bottom-left",
           });
           logout();
         } else {
-          toast.error(data.message, { position: "top-right" });
+          toast.error(data.message, { position: "bottom-left" });
         }
       })
       .catch((error) => {
         console.error("There was a problem with the network request:", error);
         toast.error("Có lỗi xảy ra khi tạo người dùng!", {
-          position: "top-right",
+          position: "bottom-left",
         });
       });
     }
@@ -104,12 +120,12 @@ const AccountInfo = () => {
           response.text()
           if(response.ok){
             toast.success("Tài khoản đã bị đóng!", {
-              position: "top-right",
+              position: "bottom-left",
             })
             logout();
           }else{
             toast.error("Lỗi!", {
-              position: "top-right",
+              position: "bottom-left",
             })
           }
         })
@@ -146,7 +162,7 @@ const AccountInfo = () => {
                       <Link to="/order">
                         Đơn hàng
                         <span className="xans-element- xans-myshop xans-myshop-orderhistorytab">
-                          (<span id="xans_myshop_total_orders">0</span>)
+                          (<span id="xans_myshop_total_orders">{orders.length}</span>)
                         </span>
                       </Link>
                     </li>
@@ -159,7 +175,7 @@ const AccountInfo = () => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -343,69 +359,6 @@ const AccountInfo = () => {
                         </Link>
                       </span>
                     </div>
-                    <div id className="layerLeave ec-base-layer">
-                      <div className="header">
-                        <h3>Hủy Tư Cách Thành Viên</h3>
-                      </div>
-                      <div className="content">
-                        <div className="ec-base-box typeMember">
-                          <div className="information">
-                            <strong className="title">Lịch Sử Ưu Đãi</strong>
-                            <div className="description">
-                              <ul>
-                                <li id>
-                                  Tất cả điểm thưởng chưa được sử dụng sẽ bị mất
-                                  khi bạn hủy tư cách thành viên.
-                                </li>
-                                <li>
-                                  Điểm Thưởng Hiện Tại :
-                                  <strong id className="txtEm">
-                                    0
-                                  </strong>
-                                </li>
-                                <li id>
-                                  Số Dư Tiền Cọc :
-                                  <strong id className="txtEm">
-                                    0
-                                  </strong>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <h4>Lý Do Hủy Tư Cách Thành Viên</h4>
-                        <div className="ec-base-table typeWrite">
-                          <table border={1} summary>
-                            <caption>Lý Do Hủy Tư Cách Thành Viên</caption>
-                            <colgroup>
-                              <col style={{ width: "140px" }} />
-                              <col style={{ width: "auto" }} />
-                            </colgroup>
-                            <tbody>
-                              <tr>
-                                <th scope="row">Lựa Chọn</th>
-                                <td />
-                              </tr>
-                              <tr id>
-                                <th scope="row">Khác</th>
-                                <td />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                      <div className="ec-base-button">
-                        <Link to="" className="btnSubmit sizeS" id>
-                          Hủy tư cách thành viên
-                        </Link>
-                        <Link to="" className="btnNormalFix sizeS">
-                          Huỷ
-                        </Link>
-                      </div>
-                      <Link to="" className="close">
-                        <img src="assets/imgs/btn_close.gif" alt="Close" />
-                      </Link>
-                    </div>
                   </div>
                 </form>
               </div>
@@ -413,37 +366,6 @@ const AccountInfo = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <Link to="">0</Link> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
       </div>
       <ToastContainer />
     </div>

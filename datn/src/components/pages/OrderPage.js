@@ -10,14 +10,18 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderInfoRes from '../common/HeaderInfoRes'
 import OrderRes from '../others/OrderRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 const OrderPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Đơn hàng';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_2352 xans_myshop_orderhistoryhead_8727'>
         <div id="container">
-            <HeaderInfoRes/>
-            <OrderRes/>
+            <HeaderInfoRes title="Đơn hàng"/>
+            <OrderRes />
             <FooterRes/>
         </div>
     </div>

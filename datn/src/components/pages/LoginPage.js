@@ -10,9 +10,13 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderAccountRes from '../common/HeaderAccountRes'
 import LoginRes from '../others/LoginRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 const LoginPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Đăng nhập';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_8974'>

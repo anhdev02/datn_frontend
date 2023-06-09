@@ -9,10 +9,14 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderAccountRes from '../common/HeaderAccountRes'
 import RegisterRes from '../others/RegisterRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 
 const RegisterPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Đăng ký';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='fr_view_888 displaynone_632 header_9947'>

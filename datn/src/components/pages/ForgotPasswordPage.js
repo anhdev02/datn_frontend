@@ -9,9 +9,13 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderRes from '../common/HeaderRes'
 import ForgotPasswordRes from '../others/ForgotPasswordRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 const ForgotPasswordPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Quên mật khẩu';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_member_findpasswd_11353'>

@@ -8,15 +8,19 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderStoresRes from '../common/HeaderStoresRes'
 import StoresRes from '../others/StoresRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 
 const StoresPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Cửa hàng';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_8155'>
       <div id="container">
-          <HeaderStoresRes/>
+          <HeaderStoresRes title="Hệ thống cửa hàng"/>
           <StoresRes/>
           <FooterRes/>
       </div>

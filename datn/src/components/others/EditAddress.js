@@ -1,8 +1,8 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import React from "react";
+import { useEffect } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 async function fetchData(url) {
   try {
@@ -16,149 +16,160 @@ async function fetchData(url) {
 }
 
 const EditAddress = (props) => {
-    const userId = parseInt(localStorage.getItem("id"), 10);
-    const user = localStorage.getItem("username");
-    const [orders, setOrders] = useState([]);
-    const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState();
-    const [phoneUpdate, setPhoneUpdate] = useState();
-    const [addressUpdate, setAddressUpdate] = useState();
+  const userId = parseInt(localStorage.getItem("id"), 10);
+  const user = localStorage.getItem("username");
+  const [orders, setOrders] = useState([]);
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState();
+  const [phoneUpdate, setPhoneUpdate] = useState();
+  const [addressUpdate, setAddressUpdate] = useState();
 
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [districtsDefault, setDistrictsDefault] = useState([]);
-    const [wards, setWards] = useState([]);
-    const [wardsDefault, setWardsDefault] = useState([]);
-  
-    const [selectedProvince, setSelectedProvince] = useState('');
-    const [selectedDistrict, setSelectedDistrict] = useState('');
-    const [selectedWard, setSelectedWard] = useState('');
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [districtsDefault, setDistrictsDefault] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [wardsDefault, setWardsDefault] = useState([]);
+  const [productFavorites, setProductFavorites] = useState([]);
 
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-      fetch(`http://localhost:8080/api/order/user/${user}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setOrders(data);
-        })
-        .catch((err) => console.log(err));
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWard] = useState("");
 
-        fetch("http://localhost:8080/api/address/" + props.id)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/order/user/${user}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(data);
+      })
+      .catch((err) => console.log(err));
+
+    fetch("http://localhost:8080/api/address/" + props.id)
       .then((response) => response.json())
       .then((data) => {
         setPhoneUpdate(data.phoneNumber);
-        setAddressUpdate(
-          `${data.houseNumber}, ${data.street}`
-        );
+        setAddressUpdate(`${data.houseNumber}, ${data.street}`);
       })
       .catch((error) => {
         console.error(error);
       });
-    }, []);
 
-    useEffect(() => {
-      const fetchDataAsync = async () => {
-        const provincesData = await fetchData("https://provinces.open-api.vn/api/p");
-        setProvinces(provincesData);
-  
-        const districtsData = await fetchData("https://provinces.open-api.vn/api/d");
-        setDistrictsDefault(districtsData);
-  
-        const wardsData = await fetchData("https://provinces.open-api.vn/api/w");
-        setWardsDefault(wardsData);
-      };
-  
-      fetchDataAsync();
-    }, []);
+    fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
+      .catch((err) => console.log(err));
+  }, []);
 
-    const handleProvinceChange = e => {
-      const selectedIndex = e.target.selectedIndex;
-      const selectedOption = e.target.options[selectedIndex];
-      const provinceId = selectedOption.getAttribute('data-code');
-      setSelectedProvince(e.target.value);
-      setSelectedDistrict('');
-      setSelectedWard('');
-      setWards([]);
-      const filteredDistricts = districtsDefault.filter(district => district.province_code === parseInt(provinceId));
-      setDistricts(filteredDistricts);
+  useEffect(() => {
+    const fetchDataAsync = async () => {
+      const provincesData = await fetchData(
+        "https://provinces.open-api.vn/api/p"
+      );
+      setProvinces(provincesData);
+
+      const districtsData = await fetchData(
+        "https://provinces.open-api.vn/api/d"
+      );
+      setDistrictsDefault(districtsData);
+
+      const wardsData = await fetchData("https://provinces.open-api.vn/api/w");
+      setWardsDefault(wardsData);
     };
-  
-    const handleDistrictChange = e => {
-      const selectedIndex = e.target.selectedIndex;
-      const selectedOption = e.target.options[selectedIndex];
-      const districtId = selectedOption.getAttribute('data-code');
-      setSelectedDistrict(e.target.value);
-      setSelectedWard('');
-  
-      const filteredWards = wardsDefault.filter(ward => ward.district_code === parseInt(districtId));
-      setWards(filteredWards);
-    };
-  
-    const handleSubmitAddress = (e) => {
+
+    fetchDataAsync();
+  }, []);
+
+  const handleProvinceChange = (e) => {
+    const selectedIndex = e.target.selectedIndex;
+    const selectedOption = e.target.options[selectedIndex];
+    const provinceId = selectedOption.getAttribute("data-code");
+    setSelectedProvince(e.target.value);
+    setSelectedDistrict("");
+    setSelectedWard("");
+    setWards([]);
+    const filteredDistricts = districtsDefault.filter(
+      (district) => district.province_code === parseInt(provinceId)
+    );
+    setDistricts(filteredDistricts);
+  };
+
+  const handleDistrictChange = (e) => {
+    const selectedIndex = e.target.selectedIndex;
+    const selectedOption = e.target.options[selectedIndex];
+    const districtId = selectedOption.getAttribute("data-code");
+    setSelectedDistrict(e.target.value);
+    setSelectedWard("");
+
+    const filteredWards = wardsDefault.filter(
+      (ward) => ward.district_code === parseInt(districtId)
+    );
+    setWards(filteredWards);
+  };
+
+  const handleSubmitAddress = (e) => {
+    e.preventDefault();
+    const pattern = /^\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+$/u;
+    if (phone !== "" && phone.length !== 9) {
+      toast.error("Vui lòng nhập đúng định dạng số điện thoại", {
+        position: "bottom-left",
+      });
+    } else if (selectedProvince === "") {
+      toast.error("Vui lòng chọn Tỉnh/Thành", { position: "bottom-left" });
+    } else if (selectedDistrict === "") {
+      toast.error("Vui lòng chọn Quận/Huyện", { position: "bottom-left" });
+    } else if (selectedWard === "") {
+      toast.error("Vui lòng chọn Phường/Xã", { position: "bottom-left" });
+    } else if (address !== undefined && !pattern.test(address)) {
+      toast.error("Vui lòng nhập đúng định dạng địa chỉ", {
+        position: "bottom-left",
+      });
+    } else {
       e.preventDefault();
-      const pattern =
-      /^\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+$/u;
-        if (phone !== '' && phone.length !== 9) {
-            toast.error("Vui lòng nhập đúng định dạng số điện thoại", {
-              position: "top-right",
+      var addressParts = address && address.split(",");
+      if (address === undefined) {
+        addressParts = addressUpdate.split(",");
+      }
+      const houseNumber = addressParts[0].trim();
+      const street = addressParts[1].trim();
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify({
+        userId: userId,
+        phoneNumber: phone === "" ? phoneUpdate : phone,
+        houseNumber: houseNumber,
+        street: street,
+        ward: selectedWard,
+        district: selectedDistrict,
+        city: selectedProvince,
+      });
+
+      var requestOptions = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch("http://localhost:8080/api/address/" + props.id, requestOptions)
+        .then((response) => {
+          if (response.ok) {
+            toast.success("Sửa địa chỉ thành công!", {
+              position: "bottom-left",
             });
-          }else if(selectedProvince === '') {
-            toast.error("Vui lòng chọn Tỉnh/Thành", { position: "top-right" });
-          }else if(selectedDistrict === '') {
-            toast.error("Vui lòng chọn Quận/Huyện", { position: "top-right" });
-          }else if(selectedWard === '') {
-            toast.error("Vui lòng chọn Phường/Xã", { position: "top-right" });
-          } else if (address !== undefined && !pattern.test(address)) {
-            toast.error("Vui lòng nhập đúng định dạng địa chỉ", {
-              position: "top-right",
-            });
+            setTimeout(() => navigate("/addressbook"), 1000);
           } else {
-            e.preventDefault();
-            var addressParts = address && address.split(",");
-            if (address === undefined) {
-              addressParts = addressUpdate.split(",");
-            }
-            const houseNumber = addressParts[0].trim();
-            const street = addressParts[1].trim();
-    
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-    
-            var raw = JSON.stringify({
-              userId: userId,
-              phoneNumber: phone === '' ? phoneUpdate : phone,
-              houseNumber: houseNumber,
-              street: street,
-              ward: selectedWard,
-              district: selectedDistrict,
-              city: selectedProvince,
+            toast.error("Sửa địa chỉ không thành công!", {
+              position: "bottom-left",
             });
-    
-            var requestOptions = {
-              method: "PUT",
-              headers: myHeaders,
-              body: raw,
-              redirect: "follow",
-            };
-    
-            fetch("http://localhost:8080/api/address/" + props.id, requestOptions)
-              .then((response) => {
-                if (response.ok) {
-                  toast.success("Sửa địa chỉ thành công!", {
-                    position: "top-right",
-                  });
-                  setTimeout(() =>  navigate('/addressbook'), 1000);
-                } else {
-                  toast.error("Sửa địa chỉ không thành công!", {
-                    position: "top-right",
-                  });
-                }
-              })
-              .then((result) => console.log(result))
-              .catch((error) => console.log("error", error));
           }
-    };
+        })
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
+    }
+  };
   return (
     <div id="wrap">
       <div id="container">
@@ -208,7 +219,7 @@ const EditAddress = (props) => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -216,9 +227,6 @@ const EditAddress = (props) => {
                     </li>
                     <li className="my_li4">
                       <Link to="/seen">Đã xem</Link>
-                    </li>
-                    <li style={{ display: "none" }} className="my_li6">
-                      <Link to="">Nhận xét của tôi</Link>
                     </li>
                     <li className="my_li7">
                       <Link to="/accountinfo">Thông tin tài khoản</Link>
@@ -252,7 +260,7 @@ const EditAddress = (props) => {
                               Số điện thoại di động{" "}
                               <span>
                                 <img
-                                  src="//img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif"
+                                  src="http://localhost:3000/assets/imgs/ico_required_blue.gif"
                                   alt="Required"
                                 />
                               </span>
@@ -266,9 +274,7 @@ const EditAddress = (props) => {
                                 pattern="[0-9]{9}"
                                 placeholder="Nhập 9 chữ số"
                                 defaultValue={phoneUpdate}
-                                onChange={(e) =>
-                                    setPhone(e.target.value)
-                                  }
+                                onChange={(e) => setPhone(e.target.value)}
                                 type="text"
                               />
                             </td>
@@ -277,7 +283,7 @@ const EditAddress = (props) => {
                             <th scope="row">
                               Địa Chỉ{" "}
                               <img
-                                src="//img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif"
+                                src="http://localhost:3000/assets/imgs/ico_required_blue.gif"
                                 alt="Required"
                               />
                             </th>
@@ -292,7 +298,9 @@ const EditAddress = (props) => {
                                     name="si_name_addr"
                                     onChange={handleProvinceChange}
                                   >
-                                    <option value='' selected disabled >Tỉnh/Thành</option>
+                                    <option value="" selected disabled>
+                                      Tỉnh/Thành
+                                    </option>
                                     {provinces.map((province) => (
                                       <option
                                         key={province.code}
@@ -308,7 +316,9 @@ const EditAddress = (props) => {
                                     name="ci_name_addr"
                                     onChange={handleDistrictChange}
                                   >
-                                    <option value='' selected disabled >Quận/Huyện</option>
+                                    <option value="" selected disabled>
+                                      Quận/Huyện
+                                    </option>
                                     {districts.map((district) => (
                                       <option
                                         key={district.code}
@@ -322,9 +332,13 @@ const EditAddress = (props) => {
                                   <select
                                     id="gu_name_addr"
                                     name="gu_name_addr"
-                                    onChange={e => setSelectedWard(e.target.value)}
+                                    onChange={(e) =>
+                                      setSelectedWard(e.target.value)
+                                    }
                                   >
-                                    <option value='' selected disabled >Phường/Xã</option>
+                                    <option value="" selected disabled>
+                                      Phường/Xã
+                                    </option>
                                     {wards.map((ward) => (
                                       <option key={ward.code} value={ward.name}>
                                         {ward.name}
@@ -334,23 +348,18 @@ const EditAddress = (props) => {
                                 </li>
                                 <li
                                   id="shippingRegist_detailAddr_wrap"
-                                  className
-                                  style={{}}
                                 >
                                   <input
                                     id="address_addr2"
                                     name="address_addr2"
-                                    placeholder="Số nhà, Đường, Phường, Quận, Thành Phố"
+                                    placeholder="Số nhà, Đường"
                                     className="inputTypeText"
                                     type="text"
                                     size={60}
-                                    defaultValue={addressUpdate}
-                                    onChange={(e) =>
-                                        setAddress(e.target.value)
-                                      }
-                                    pattern="/^\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+$/u"
                                     maxLength={255}
-                                    style={{}}
+                                    defaultValue={addressUpdate}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    pattern="/^\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+$/u"
                                   />
                                 </li>
                               </ul>
@@ -360,14 +369,13 @@ const EditAddress = (props) => {
                       </table>
                     </div>
                     <div className="ec-base-button">
-                      <a
-                        href="#st"
+                      <Link
+                        to=""
                         className="btnBlack btn150"
                         onClick={handleSubmitAddress}
-                        onclick="myshopAddr.formCheck();"
                       >
                         Lưu
-                      </a>
+                      </Link>
                       <Link to="/addressbook" className="btnWhite btn150">
                         Hủy
                       </Link>
@@ -402,40 +410,9 @@ const EditAddress = (props) => {
         </div>
         <hr className="layout" />
       </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <Link to="">0</Link> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
-      </div>
       <ToastContainer />
     </div>
-  )
-}
+  );
+};
 
-export default EditAddress
+export default EditAddress;

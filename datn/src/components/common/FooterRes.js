@@ -73,21 +73,21 @@ const FooterRes = () => {
             </div>
           </div>
           <div className="div_onlinegovvn">
-            <img src="assets/imgs/onlinegovvn%20sticker.png" alt="" />
+            <img src="http://localhost:3000/assets/imgs/onlinegovvn%20sticker.png" alt="" />
             <ul>
               <li>
                 <Link to="" className="verti_img">
-                  <img src="assets/imgs/youtube.gif" alt="Youtube" />
+                  <img src="http://localhost:3000/assets/imgs/youtube.gif" alt="Youtube" />
                 </Link>
               </li>
               <li>
                 <Link to="" className="verti_img">
-                  <img src="assets/imgs/icon_facebook.png" alt="Facebook" />
+                  <img src="http://localhost:3000/assets/imgs/icon_facebook.png" alt="Facebook" />
                 </Link>
               </li>
               <li>
                 <Link to="" className="verti_img">
-                  <img src="assets/imgs/insta.gif" alt="Instargam" />
+                  <img src="http://localhost:3000/assets/imgs/insta.gif" alt="Instargam" />
                 </Link>
               </li>
             </ul>

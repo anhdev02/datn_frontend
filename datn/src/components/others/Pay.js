@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { store } from "../../store/store";
-
+import { DeleteCart } from "../../store/action/cart";
+import { PayPalButton } from "react-paypal-button-v2";
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
   currency: "VND",
@@ -21,6 +22,8 @@ async function fetchData(url) {
 }
 
 const Pay = () => {
+  const location = useLocation();
+  const Products = location.state;
   const userId = parseInt(localStorage.getItem("id"), 10);
   const [activeTab, setActiveTab] = useState(1);
   const [isUpdateForm, setIsUpdateForm] = useState(false);
@@ -40,12 +43,13 @@ const Pay = () => {
   const [districtsDefault, setDistrictsDefault] = useState([]);
   const [wards, setWards] = useState([]);
   const [wardsDefault, setWardsDefault] = useState([]);
+  const [payMethod, setpayMethod] = useState(1);
 
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
   var totalPriceSale = 0,
-    totalPrice = 0;
+    totalPrice = 0, usa = 0;
   var today = new Date();
   var month = (today.getMonth() + 1).toString().padStart(2, "0");
   var day = today.getDate().toString().padStart(2, "0");
@@ -63,7 +67,11 @@ const Pay = () => {
         }
       })
       .catch((err) => console.log(err));
-    loadDataCart();
+    if (Products !== null && Products.products.length !== 0) {
+      setProducts(Products.products);
+    } else {
+      loadDataCart();
+    }
   }, [isRender]);
 
   useEffect(() => {
@@ -112,6 +120,10 @@ const Pay = () => {
     setWards(filteredWards);
   };
 
+  const setMethod = (method) => {
+    setpayMethod(method);
+  }
+
   function sendMail() {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -119,7 +131,51 @@ const Pay = () => {
     var raw = JSON.stringify({
       emailAddress: localStorage.getItem("email"),
       emailSubject: "Xác nhận đơn hàng",
-      emailBody: "Chúng tôi đã xác nhận đơn hàng của bạn",
+      emailBody: `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                background-color: #f5f5f5;
+              }
+    
+              .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              }
+    
+              h1 {
+                color: #333333;
+              }
+    
+              p {
+                color: #666666;
+              }
+    
+              .footer {
+                margin-top: 20px;
+                text-align: center;
+                color: #999999;
+                font-size: 12px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Xác nhận đơn hàng</h1>
+              <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được xác nhận.</p>
+              <p>Cảm ơn bạn đã mua hàng!</p>
+              <p class="footer">Đội ngũ hỗ trợ của chúng tôi</p>
+            </div>
+          </body>
+        </html>
+      `,
+      emailContentType: "text/html",
     });
 
     var requestOptions = {
@@ -207,17 +263,17 @@ const Pay = () => {
     if (isUpdateForm) {
       if (phone !== "" && phone.length !== 9) {
         toast.error("Vui lòng nhập đúng định dạng số điện thoại", {
-          position: "top-right",
+          position: "bottom-left",
         });
       } else if (selectedProvince === "") {
-        toast.error("Vui lòng chọn Tỉnh/Thành", { position: "top-right" });
+        toast.error("Vui lòng chọn Tỉnh/Thành", { position: "bottom-left" });
       } else if (selectedDistrict === "") {
-        toast.error("Vui lòng chọn Quận/Huyện", { position: "top-right" });
+        toast.error("Vui lòng chọn Quận/Huyện", { position: "bottom-left" });
       } else if (selectedWard === "") {
-        toast.error("Vui lòng chọn Phường/Xã", { position: "top-right" });
+        toast.error("Vui lòng chọn Phường/Xã", { position: "bottom-left" });
       } else if (address !== undefined && !pattern.test(address)) {
         toast.error("Vui lòng nhập đúng định dạng địa chỉ", {
-          position: "top-right",
+          position: "bottom-left",
         });
       } else {
         e.preventDefault();
@@ -252,7 +308,7 @@ const Pay = () => {
           .then((response) => {
             if (response.ok) {
               toast.success("Sửa địa chỉ thành công!", {
-                position: "top-right",
+                position: "bottom-left",
               });
               setPhone(" ");
               setAddress(undefined);
@@ -262,44 +318,44 @@ const Pay = () => {
               document.getElementById("frm_order_act").reset();
             } else {
               toast.error("Sửa địa chỉ không thành công!", {
-                position: "top-right",
+                position: "bottom-left",
               });
               setIsRender(!isRender);
             }
           })
           .then((result) => console.log(result))
           .catch((error) => console.log("error", error));
-          document.getElementById("frm_order_act").reset();
-          const form = document.getElementById("frm_order_act");
-          const selectElements = form.getElementsByTagName("select");
-      
-          for (let i = 0; i < selectElements.length; i++) {
-            selectElements[i].selectedIndex = 0;
-          }
-          setSelectedProvince("");
-          setSelectedDistrict("");
-          setSelectedWard("");
-          setDistricts([]);
-          setWards([]);
+        document.getElementById("frm_order_act").reset();
+        const form = document.getElementById("frm_order_act");
+        const selectElements = form.getElementsByTagName("select");
+
+        for (let i = 0; i < selectElements.length; i++) {
+          selectElements[i].selectedIndex = 0;
+        }
+        setSelectedProvince("");
+        setSelectedDistrict("");
+        setSelectedWard("");
+        setDistricts([]);
+        setWards([]);
       }
     } else {
       if (phone === "") {
-        toast.error("Vui lòng nhập số điện thoại", { position: "top-right" });
+        toast.error("Vui lòng nhập số điện thoại", { position: "bottom-left" });
       } else if (phone.length !== 9) {
         toast.error("Vui lòng nhập đúng định dạng số điện thoại", {
-          position: "top-right",
+          position: "bottom-left",
         });
       } else if (selectedProvince === "") {
-        toast.error("Vui lòng chọn Tỉnh/Thành", { position: "top-right" });
+        toast.error("Vui lòng chọn Tỉnh/Thành", { position: "bottom-left" });
       } else if (selectedDistrict === "") {
-        toast.error("Vui lòng chọn Quận/Huyện", { position: "top-right" });
+        toast.error("Vui lòng chọn Quận/Huyện", { position: "bottom-left" });
       } else if (selectedWard === "") {
-        toast.error("Vui lòng chọn Phường/Xã", { position: "top-right" });
+        toast.error("Vui lòng chọn Phường/Xã", { position: "bottom-left" });
       } else if (address === undefined) {
-        toast.error("Vui lòng nhập địa chỉ", { position: "top-right" });
+        toast.error("Vui lòng nhập địa chỉ", { position: "bottom-left" });
       } else if (!pattern.test(address)) {
         toast.error("Vui lòng nhập đúng định dạng địa chỉ", {
-          position: "top-right",
+          position: "bottom-left",
         });
       } else {
         const addressParts = address.split(",");
@@ -330,7 +386,7 @@ const Pay = () => {
           .then((response) => {
             if (response.ok) {
               toast.success("Thêm địa chỉ thành công!", {
-                position: "top-right",
+                position: "bottom-left",
               });
               document.getElementById("frm_order_act").reset();
               setPhone(" ");
@@ -339,7 +395,7 @@ const Pay = () => {
               setIsRender(!isRender);
             } else {
               toast.error("Thêm địa chỉ không thành công!", {
-                position: "top-right",
+                position: "bottom-left",
               });
               setIsRender(!isRender);
             }
@@ -369,7 +425,7 @@ const Pay = () => {
           })
           .catch((error) => {
             toast.error("Số lượng sản phẩm không đủ!", {
-              position: "top-right",
+              position: "bottom-left",
             });
             throw new Error("Số lượng sản phẩm không đủ!");
           });
@@ -386,7 +442,7 @@ const Pay = () => {
             phone: addresses[0].phoneNumber,
             email: localStorage.getItem("email"),
             total: totalPrice - totalPriceSale + 16000,
-            status: "Chờ Thanh Toán",
+            status: payMethod === 1 ? "Chờ Thanh Toán" : "Chuẩn Bị Giao Hàng",
             trash: false,
             confirm: false,
             date: date,
@@ -434,18 +490,24 @@ const Pay = () => {
             })
             .catch((error) => console.log(error));
           sendMail();
-          store.getState().cart.carts = [];
-          localStorage.removeItem("CART");
+          if (Products !== null && Products.products.length !== 0) {
+            Products.products.map((product) => {
+              store.dispatch(DeleteCart(product.stt));
+            });
+          } else {
+            store.getState().cart.carts = [];
+            localStorage.removeItem("CART");
+          }
           toast.success("Bạn đã đặt hàng thành công!", {
-            position: "top-right",
+            position: "bottom-left",
           });
-          setTimeout(() => setIsOrder(true), 1000);
+          setTimeout(() => setIsOrder(true), 2000);
         })
         .catch((error) => {
           console.log(requests);
         });
     } else {
-      toast.error("Bạn chưa có địa chỉ!", { position: "top-right" });
+      toast.error("Bạn chưa có địa chỉ!", { position: "bottom-left" });
     }
   }
 
@@ -464,7 +526,7 @@ const Pay = () => {
               <span>Trang Hiện Tại</span>
               <ol>
                 <li>
-                  <a href="/">Trang Chủ</a>
+                  <Link href="/">Trang Chủ</Link>
                 </li>
                 <li title="Current Page">
                   <strong>Đặt hàng/ Thanh toán</strong>
@@ -501,6 +563,7 @@ const Pay = () => {
                                 product.quantity;
                             totalPrice =
                               totalPrice + product.price * product.quantity;
+                              usa = ((totalPrice - totalPriceSale + 16000)/23000).toFixed(2);
                             return (
                               <div className="ec-base-prdInfo">
                                 <div className="prdBox">
@@ -579,7 +642,6 @@ const Pay = () => {
                               </li>
                             </ul>
                           </div>
-                          {/* Recent shipping address */}
                           <div
                             id="ec-shippingInfo-recentAddress"
                             className={
@@ -592,9 +654,7 @@ const Pay = () => {
                               <div
                                 id="ec-shippingInfo-recentAddressList"
                                 className="segment"
-                                style={{}}
                               >
-                                <h3 className="heading">Chọn</h3>
                                 <ul className="shippingList">
                                   {addresses.map((address) => (
                                     <li className="xans-element- xans-order xans-order-deliverylist xans-record-">
@@ -633,6 +693,7 @@ const Pay = () => {
                                 <span
                                   onClick={handleCloseAddressList}
                                   className="sideRight"
+                                  style={{ top: "-40px" }}
                                 >
                                   <button
                                     type="button"
@@ -650,7 +711,6 @@ const Pay = () => {
                               >
                                 <div className="recent">
                                   <p className="address gBlank10">
-                                    <br />
                                     <span id="delivery_info_country">
                                       VIET NAM
                                     </span>
@@ -753,7 +813,6 @@ const Pay = () => {
                                         <li
                                           id="freceiver_area_wrap"
                                           className="ec-address-area"
-                                          style={{}}
                                         >
                                           <select
                                             id="si_name_addr"
@@ -838,9 +897,9 @@ const Pay = () => {
                                         style={{ marginTop: "30px" }}
                                         className="xans-product xans-product-listmore productPaginate typeMoreview"
                                       >
-                                        <a href="#st" className="btnMore">
+                                        <Link to="" className="btnMore">
                                           <span>Lưu</span>
-                                        </a>
+                                        </Link>
                                       </div>
                                     </td>
                                   </tr>
@@ -907,7 +966,7 @@ const Pay = () => {
                                   Phương tiện thanh toán khác
                                 </label>
                                 <div className="inner">
-                                  <span className="ec-base-label">
+                                  <span className="ec-base-label" onClick={()=>setMethod(1)}>
                                     <input
                                       id="addr_paymethod0"
                                       name="addr_paymethod"
@@ -923,7 +982,7 @@ const Pay = () => {
                                       />
                                     </label>
                                   </span>
-                                  <span className="ec-base-label">
+                                  <span className="ec-base-label" onClick={()=>setMethod(2)}>
                                     <input
                                       id="addr_paymethod1"
                                       name="addr_paymethod"
@@ -1131,15 +1190,34 @@ const Pay = () => {
                           <div
                             className="ec-base-button gFull"
                             id="orderFixItem"
+                            style={{maxHeight: "102px"}}
                           >
-                            <button
-                              type="button"
-                              className="btnSubmit"
-                              id="custom_submit"
-                              onClick={addOrder}
-                            >
-                              Thanh toán
-                            </button>
+                            { payMethod && payMethod === 1 ? (
+                              <button
+                                type="button"
+                                className="btnSubmit"
+                                id="custom_submit"
+                                onClick={addOrder}
+                              >
+                                Thanh toán
+                              </button>
+                            ) : (
+                              <PayPalButton
+                              amount={usa}
+                              options={{
+                                clientId: "Ad14McxM47SyPz8oGbUezWuU8G1djRdgkcmAq2GMr5DICEsAiNp8uhh5rZBNd2IZ3sMLkR0rawx2qufX",
+                                currency: "USD",
+                              }}
+                              onSuccess={() => {
+                                addOrder();
+                              }}
+                              onError={() => {
+                                alert(
+                                  "Error"
+                                );
+                              }}
+                            ></PayPalButton>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1271,28 +1349,25 @@ const Pay = () => {
                               <div className="ec-base-prdInfo">
                                 <div className="prdBox">
                                   <div className="thumbnail">
-                                    <a href="/product/detail.html?product_no=737&cate_no=1">
+                                    <Link to="">
                                       <img
                                         src="assets/imgs/259b7ecfc32f57abe04816626e31c248.jpg"
                                         alt=""
                                         width={90}
                                         height={90}
                                       />
-                                    </a>
+                                    </Link>
                                   </div>
                                   <div className="description">
                                     <strong
                                       className="prdName"
                                       title="Product Name"
                                     >
-                                      <a
-                                        href="/product/chảo-chống-dính-decore-locklock-có-nắp-22cm-màu-xanh-lá-yellow-green-l/737/category/1/"
-                                        className="ec-product-name"
-                                      >
+                                      <Link to="" className="ec-product-name">
                                         Chảo chống dính Decore Lock&amp;Lock có
                                         nắp 22cm màu xanh lá Yellow green -
                                         LDE1227IH
-                                      </a>
+                                      </Link>
                                     </strong>
                                     <ul className="info">
                                       <li>Số lượng: 1 sản phẩm</li>
@@ -1314,27 +1389,24 @@ const Pay = () => {
                               <div className="ec-base-prdInfo">
                                 <div className="prdBox">
                                   <div className="thumbnail">
-                                    <a href="/product/detail.html?product_no=739&cate_no=1">
+                                    <Link to="">
                                       <img
                                         src="assets/imgs/ce85dc221a3c99c4c56e2c7ccc5f3b98.jpg"
                                         alt=""
                                         width={90}
                                         height={90}
                                       />
-                                    </a>
+                                    </Link>
                                   </div>
                                   <div className="description">
                                     <strong
                                       className="prdName"
                                       title="Product Name"
                                     >
-                                      <a
-                                        href="/product/chảo-đúc-locklock-master-deep-pan-lmd1245-có-nắp-24cm/739/category/1/"
-                                        className="ec-product-name"
-                                      >
+                                      <Link to="" className="ec-product-name">
                                         Chảo đúc Lock&amp;Lock Master Deep Pan
                                         LMD1245 có nắp 24cm
-                                      </a>
+                                      </Link>
                                     </strong>
                                     <ul className="Option">
                                       <li title="Option">
@@ -1726,37 +1798,6 @@ const Pay = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="/order/basket.html">2</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-layout xans-layout-productrecent">
-          <h2>
-            <a href="/product/recent_view_product.html">Đã Xem Gần Đây</a>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <a href="#header" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </a>
-        </p>
       </div>
       <ToastContainer />
     </div>

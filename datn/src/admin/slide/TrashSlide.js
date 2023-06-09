@@ -4,21 +4,21 @@ import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 
 const TrashSlide = () => {
-  
-  var url = "http://localhost:8080/api/slide/trash";
   const [slide, setSlide] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
   useEffect(() => {
-    fetch(url)
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/slide/trash')
     .then((res) => res.json())
     .then((data) => {
       setSlide(data);
-      setCurrentPage(1);
     })
     .catch((err) => console.log(err));
-  }, [isDeleted]);
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -64,10 +64,12 @@ const TrashSlide = () => {
 
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+          console.log(result);
+          loadData();
+        })
         .catch((error) => console.log("error", error));
         toast.success("Slide đã được khôi phục!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
   }
 
   const Delete = async (event) => {
@@ -96,9 +98,11 @@ const TrashSlide = () => {
             })
           }
         })
-        .then(result => console.log(result))
+        .then(result => {
+          console.log(result);
+          loadData();
+        })
         .catch(error => console.log('error', error));
-        setIsDeleted(!isDeleted);
     }
   }
 

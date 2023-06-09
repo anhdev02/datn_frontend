@@ -48,53 +48,6 @@ const CustomerCare = () => {
           </div>
           <hr className="layout" />
         </div>
-        <hr className="layout" />
-        <div id="quick">
-          <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-            <strong>Giỏ Hàng</strong>
-            <span><Link to="">0</Link> Sản Phẩm</span>
-          </div>
-          <div className="xans-element- xans-layout xans-layout-productrecent">
-            <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-            </h2>
-            <ul>
-              <li className="xans-record-">
-                <a href="/product/detail.html?product_no=732&cate_no=50&display_group=1"><img src="./assets/imgs/acaf2d98c89581ad28490f4c3828637c.jpg" alt="" /><span>Khăn g</span></a>
-              </li>
-              <li className="xans-record-">
-                <a href="/product/detail.html?product_no=424&cate_no=111&display_group=1"><img src="assets/imgs/0424eea678a99ff8c3c4012b4847ddb0.jpg" alt="" /><span>Ức vịt</span></a>
-              </li>
-              <li className="xans-record-">
-                <a href="/product/detail.html?product_no=421&cate_no=111&display_group=1"><img src="assets/imgs/3fada5ea33bd743262dde65885ea635f.jpg" alt="" /><span>Ba chỉ</span></a>
-              </li>
-              <li className="xans-record-">
-                <a href="/product/detail.html?product_no=725&cate_no=50&display_group=1"><img src="assets/imgs/59ad09a9ae30d0aa19bdbbdd11daed74.jpg" alt="" /><span>Cây la</span></a>
-              </li>
-              <li className="displaynone xans-record-">
-                <a href="/product/detail.html?product_no=646&cate_no=55&display_group=1"><img src="assets/imgs/643a83fcce439db32ecfd544e32fd5d6.jpg" alt="" /><span>Lò nướng</span></a>
-              </li>
-              <li className="displaynone xans-record-">
-                <a href="/product/detail.html?product_no=706&cate_no=44&display_group=1"><img src="assets/imgs/cd3dcabef14003975986044c93533f8e.jpg" alt="" /><span>Bộ hộp</span></a>
-              </li>
-              <li className="displaynone xans-record-">
-                <a href="/product/detail.html?product_no=657&cate_no=46&display_group=1"><img src="assets/imgs/6d403405e93028f8603bad551c5e4445.jpg" alt="" /><span>Nồi ch</span></a>
-              </li>
-              <li className="displaynone xans-record-">
-                <a href="/product/detail.html?product_no=686&cate_no=29&display_group=1"><img src="assets/imgs/bd93a5771cd2d6261bc294d571112351.jpg" alt="" /><span>Bình g</span></a>
-              </li>
-              <li className="displaynone xans-record-">
-                <a href="/product/detail.html?product_no=658&cate_no=43&display_group=1"><img src="assets/imgs/b6ab0a49783cdaa7f25f5106da710655.jpg" alt="" /><span>Máy xa</span></a>
-              </li>
-            </ul>
-            <p className="player">
-              <img src="assets/imgs/btn_recent_prev.gif" alt="Prev" className="prev" style={{cursor: 'pointer'}} /><img src="assets/imgs/btn_recent_next.gif" alt="Next" className="next" style={{cursor: 'pointer'}} />
-            </p>
-          </div>
-          <p className="pageTop">
-            <a href="#header" title="Back to Top"><img src="assets/imgs/btn_top1.gif" alt="Top" /></a>
-          </p>
-        </div>
       </div>
   )
 }

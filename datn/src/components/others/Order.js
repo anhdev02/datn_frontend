@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { confirm } from "react-confirm-box";
+import { ToastContainer, toast } from "react-toastify";
 
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -10,7 +12,9 @@ const formatter = new Intl.NumberFormat("vi-VN", {
 });
 
 const Order = () => {
+  const userId = parseInt(localStorage.getItem("id"), 10);
   const user = localStorage.getItem("username");
+  const [productFavorites, setProductFavorites] = useState([]);
   const [orders, setOrders] = useState([]);
   const [originalOrders, setOriginalOrders] = useState([]);
   const [orderDetails, setOrderDetails] = useState([]);
@@ -18,6 +22,14 @@ const Order = () => {
   const [itemsPerPage, setItemsPerPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState("all");
   useEffect(() => {
+    fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
+      .catch((err) => console.log(err));
+      loadData();
+  }, []);
+
+  const loadData = () => {
     fetch(`http://localhost:8080/api/order/user/${user}`)
       .then((res) => res.json())
       .then((data) => {
@@ -25,7 +37,41 @@ const Order = () => {
         setOrders(data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }
+
+  const addTrash = async (event) => {
+    event.preventDefault();
+    const result = await confirm("Bạn có chắc muốn hủy đơn hàng?", event);
+    if (result) {
+      var id = event.target.id;
+      var url = "http://localhost:8080/api/order/" + id;
+      
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+  
+      var raw = JSON.stringify({
+        confirm: false,
+        trash: true,
+      });
+  
+      var requestOptions = {
+        method: "PATCH",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+  
+      fetch(url, requestOptions)
+        .then((response) => response.text())
+        .then((result) =>{
+          console.log(result);
+          loadData();
+          toast.success("Đã xóa tạm thời đơn hàng!", { position: "bottom-left" });
+        })
+        .catch((error) => console.log("error", error));
+    }
+
+  }
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -45,9 +91,9 @@ const Order = () => {
     const activeClass = number === currentPage ? "this" : "other";
     return (
       <li>
-        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+        <Link onClick={handleClick} id={number} to="" className={activeClass}>
           {number}
-        </a>
+        </Link>
       </li>
     );
   });
@@ -55,13 +101,16 @@ const Order = () => {
   const handleStatusChange = (event) => {
     setSelectedStatus(event.target.value);
     filterOrders(event.target.value);
+    setCurrentPage(1);
   };
 
   const filterOrders = (status) => {
-    if (status === 'all') {
+    if (status === "all") {
       setOrders(originalOrders);
     } else {
-      const filteredOrders = originalOrders.filter((order) => order.status === status);
+      const filteredOrders = originalOrders.filter(
+        (order) => order.status === status
+      );
       setOrders(filteredOrders);
     }
   };
@@ -137,7 +186,7 @@ const Order = () => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -177,16 +226,14 @@ const Order = () => {
                           <option value="all">
                             Tình trạng xử lý tất cả đơn hàng
                           </option>
-                          <option value="Chờ Thanh Toán">
-                            Chờ Thanh Toán
-                          </option>
+                          <option value="Chờ Thanh Toán">Chờ Thanh Toán</option>
                           <option value="Chuẩn Bị Giao Hàng">
                             Chuẩn Bị Giao Hàng
                           </option>
-                          <option value="Đang Vận Chuyển">Đang Vận Chuyển</option>
-                          <option value="Đã Giao">
-                            Đã Giao
+                          <option value="Đang Vận Chuyển">
+                            Đang Vận Chuyển
                           </option>
+                          <option value="Đã Giao">Đã Giao</option>
                         </select>
                       </div>
                     </fieldset>
@@ -216,12 +263,30 @@ const Order = () => {
                           <tr>
                             <td colSpan={3}>
                               <div className="number">
-                                <a href={`detail.html?order_id=${order.id}`}>
+                                <Link to="">
                                   <strong>Mã đơn hàng | </strong>
                                   {order.id}
-                                </a>
+                                </Link>
                                 <strong>Ngày đặt | </strong>
                                 {order.date}
+                                {
+                                  order.status !== "Đã Giao" && (
+                                    <Link
+                                      to="/"
+                                      id={order.id}
+                                      className="btnWhite"
+                                      style={{
+                                        padding: "1px 17px",
+                                        float: "right",
+                                        marginRight: "37px",
+                                        marginTop: "-8px",
+                                      }}
+                                      onClick={addTrash}
+                                    >
+                                      Huỷ
+                                    </Link>
+                                  )
+                                }
                               </div>
                             </td>
                           </tr>
@@ -287,37 +352,7 @@ const Order = () => {
         </div>
         <hr className="layout" />
       </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="#st">0</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <a href="#header" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </a>
-        </p>
-      </div>
+      <ToastContainer />
     </div>
   );
 };

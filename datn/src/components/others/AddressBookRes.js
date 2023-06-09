@@ -1,132 +1,104 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { confirm } from "react-confirm-box";
+import { ToastContainer, toast } from "react-toastify";
 
 const AddressBookRes = () => {
+  const user = localStorage.getItem("username");
+  const userId = parseInt(localStorage.getItem("id"), 10);
+  const [addresses, setAddresses] = useState([]);
+
+  const loadData = () => {
+    fetch(`http://localhost:8080/api/address/user/${userId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setAddresses(data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const Delete = async (event) => {
+    event.preventDefault();
+    var id = event.target.dataset.id;
+
+    var url = "http://localhost:8080/api/address/" + id;
+    var requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+
+    fetch(url, requestOptions)
+      .then((response) => {
+        response.text();
+        if (response.ok) {
+          toast.success("Xóa thành công!", {
+            position: "bottom-center",
+          });
+        } else {
+          toast.error("Xóa không thành công!", {
+            position: "bottom-center",
+          });
+        }
+      })
+      .then((result) => console.log(result))
+      .catch((error) => console.log("error", error));
+    loadData();
+  };
   return (
     <div id="contents">
       <div className="root_width myshop_width">
-        <form
-          id="frmAddr"
-          name
-          action="/exec/front/Myshop/Addr/?mode=Delete&return_url=%2Fmyshop%2Faddr%2Flist.html"
-          method="post"
-          target="_self"
-          encType="multipart/form-data"
-        >
-          <input
-            id="__address_addr1"
-            name="__address_addr1"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="__city_name"
-            name="__city_name"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="__state_name"
-            name="__state_name"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="__isRuleBasedAddrForm"
-            name="__isRuleBasedAddrForm"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="__use_foreign_country_list"
-            name="__use_foreign_country_list"
-            defaultValue="T"
-            type="hidden"
-          />
-          <input
-            id="__ma_rcv_contry_code"
-            name="__ma_rcv_contry_code"
-            defaultValue
-            type="hidden"
-          />
-          <input id="__country" name="__country" defaultValue type="hidden" />
-          <input id="__province" name="__province" defaultValue type="hidden" />
-          <input id="__city" name="__city" defaultValue type="hidden" />
-          <input id="__district" name="__district" defaultValue type="hidden" />
-          <input
-            id="is_display_phone"
-            name="is_display_phone"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="is_display_mobile"
-            name="is_display_mobile"
-            defaultValue
-            type="hidden"
-          />
-          <input
-            id="sUseCountryNumberFlag"
-            name="sUseCountryNumberFlag"
-            defaultValue="T"
-            type="hidden"
-          />
+        <form id="frmAddr">
           <div className="xans-element- xans-myshop xans-myshop-addrlist">
             <div className="myshop_AddrList_top">
               <div className="titleArea-new">
                 <h2>Danh Sách Địa Chỉ</h2>
               </div>
-              <Link to="" className="btnBlack">
+              <Link to="/newaddress" className="btnBlack">
                 Thêm Địa Chỉ Mới.
               </Link>
             </div>
             <div className="addList">
-              <div className="description xans-record-">
-                <p className="name">
-                  <span className="authssl_ma_rcv_title_0">*****</span>
-                  <span className="color-blue displaynone">
-                    Địa chỉ mặc định
-                  </span>
-                </p>
-                <div className="info">
-                  <ul className="address">
-                    <li>
-                      <div className="address-title">Địa chỉ</div>
-                      <div>
-                        <span className="authssl_ma_rcv_addr_0">*****</span>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="address-title">Điện thoại</div>
-                      <div>
-                        <span className="authssl_ma_rcv_phone_0">*****</span>
-                        <span className="authssl_ma_rcv_mobile_no_0">
-                          *****
-                        </span>
-                      </div>
-                    </li>
-                  </ul>
+              {addresses.map((address) => (
+                <div className="description">
+                  <div className="info">
+                    <ul className="address">
+                      <li>
+                        <div className="address-title">Địa chỉ</div>
+                        <div>
+                          <span className="authssl_ma_rcv_addr_0">{`${address.houseNumber}, ${address.street}, ${address.ward}, ${address.district}, ${address.city}`}</span>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="address-title">Điện thoại</div>
+                        <div>
+                          <span className="authssl_ma_rcv_phone_0">+84</span>
+                          <span className="authssl_ma_rcv_mobile_no_0">
+                            {address.phoneNumber}
+                          </span>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="ec-base-button">
+                    <Link to={`/edit/address/${address.id}`}>Chính sửa</Link>
+                    <Link data-id={address.id} onClick={Delete} to="">
+                      Xoá
+                    </Link>
+                  </div>
                 </div>
-                <div className="ec-base-button">
-                  <Link to="" onclick>
-                    Chính sửa
-                  </Link>
-                  <Link to="">Xoá</Link>
-                </div>
-              </div>
+              ))}
             </div>
             <p className="empty displaynone">
               Sổ địa chỉ của bạn hiện đang trống.
             </p>
-            <div className="help">
-              <p>
-                Nếu bạn không muốn cập nhật tự động, mở Danh Sách Địa Chỉ và
-                thay đổi cài đặt cập nhật tự động thành “Cố định”.
-              </p>
-            </div>
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };

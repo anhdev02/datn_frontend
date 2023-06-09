@@ -1,7 +1,97 @@
 import React from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+const formatter = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+  minimumFractionDigits: 0,
+});
+
 const OrderRes = () => {
+  const user = localStorage.getItem("username");
+  const [orders, setOrders] = useState([]);
+  const [originalOrders, setOriginalOrders] = useState([]);
+  const [orderDetails, setOrderDetails] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/order/user/${user}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOriginalOrders(data);
+        setOrders(data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(orders.length / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    setCurrentPage(Number(event.target.id));
+  };
+
+  const renderPageNumbers = pageNumbers.map((number) => {
+    const activeClass = number === currentPage ? "this" : "other";
+    return (
+      <li>
+        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+          {number}
+        </a>
+      </li>
+    );
+  });
+
+  const handleStatusChange = (event) => {
+    setSelectedStatus(event.target.value);
+    filterOrders(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const filterOrders = (status) => {
+    if (status === "all") {
+      setOrders(originalOrders);
+    } else {
+      const filteredOrders = originalOrders.filter(
+        (order) => order.status === status
+      );
+      setOrders(filteredOrders);
+    }
+  };
+
+  const fetchData = async (orderId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/orderdetail/${orderId}`
+      );
+      const data = await response.json();
+      setOrderDetails((prevState) => ({
+        ...prevState,
+        [orderId]: data,
+      }));
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    orders.forEach((order) => {
+      fetchData(order.id);
+    });
+  }, [orders]);
+
   return (
     <div id="contents">
       <div className="root_width myshop_width">
@@ -15,268 +105,85 @@ const OrderRes = () => {
                   id="order_status"
                   name="order_status"
                   className="fSelect"
+                  onChange={handleStatusChange}
                 >
                   <option value="all">Tình trạng xử lý tất cả đơn hàng</option>
-                  <option value="shipped_before">Trước thanh toán</option>
-                  <option value="shipped_standby">Chuẩn bị vận chuyển</option>
-                  <option value="shipped_begin">Đang vận chuyển</option>
-                  <option value="shipped_complate">Hoàn tất vận chuyển</option>
-                  <option value="order_cancel">Hủy</option>
-                  <option value="order_exchange">Đổi hàng</option>
-                  <option value="order_return">Trả hàng</option>
+                  <option value="Chờ Thanh Toán">Chờ Thanh Toán</option>
+                  <option value="Chuẩn Bị Giao Hàng">Chuẩn Bị Giao Hàng</option>
+                  <option value="Đang Vận Chuyển">Đang Vận Chuyển</option>
+                  <option value="Đã Giao">Đã Giao</option>
                 </select>
-              </div>
-              <div className="ec-base-button gColumn">
-                <a href="#none" className="btnNormal">
-                  1 Tháng
-                </a>
-                <a href="#none" className="btnNormal selected">
-                  3 Tháng
-                </a>
-                <a href="#none" className="btnNormal">
-                  6 Tháng
-                </a>
-                <a href="#none" className="btnBasic eDataSet">
-                  Tuỳ Chỉnh
-                </a>
-              </div>
-              <div id="dataSearch">
-                <input
-                  id="history_start_date"
-                  name="history_start_date"
-                  className="fText"
-                  readOnly="readonly"
-                  size={10}
-                  defaultValue="2022-12-16"
-                  type="text"
-                />
-                ~
-                <input
-                  id="history_end_date"
-                  name="history_end_date"
-                  className="fText"
-                  readOnly="readonly"
-                  size={10}
-                  defaultValue="2023-03-16"
-                  type="text"
-                />
-                <input
-                  alt="Tìm kiếm"
-                  id="order_search_btn"
-                  type="image"
-                  src="./assets/imgs/btn_search_mobile.png"
-                />
               </div>
             </fieldset>
           </div>
         </form>
         <div className="xans-element- xans-myshop xans-myshop-orderhistorylistitem Myshop_section">
-          <div className="orderList displaynone">
-            <div className="order order_borderdisplaynone">
-              <h3 className="displaynone">
-                <span className="number" title="Order No.">
-                  <a href="detail.html">Mã đơn hàng | </a>
-                </span>
-              </h3>
-              <p className="displaynone">
-                <span className="date" title="Order Date" />
-              </p>
-              <div className="ec-base-prdInfo">
-                <div className="prdBox">
-                  <div className="thumbnail">
-                    <a href="/product/detail.html">
-                      <img src width={71} height={71} alt="" />
+          <div className="orderList ">
+            {currentItems.map((order) => (
+              <div className="order order_border xans-record-">
+                <h3>
+                  <span className="number" title="Order No.">
+                    <a href="detail.html?order_id=20230317-0000019&page=1&history_start_date=2023-02-25&history_end_date=2023-05-26">
+                      Mã đơn hàng | {order.id}
                     </a>
-                  </div>
-                  <div className="description">
-                    <strong className="prdName" title="Product" />
-                    <ul className="info">
-                      <li>
-                        <span className="price" title="Price">
-                          <strong />
-                          <span className="refer displaynone"> </span>
-                        </span>
-                        <span className="ec-base-qty" title="Quantity">
-                          <strong /> sản phẩm
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <p className="option displaynone" />
-                <ul className="xans-element- xans-myshop xans-myshop-optionset option">
-                  <li className>
-                    <div className="name">
-                      <strong className="optionDesc" /> ( sản phẩm)
+                  </span>
+                </h3>
+                <p className>
+                  <span className="date" title="Order Date">
+                    {order.date}
+                  </span>
+                </p>
+                {orderDetails[order.id]?.map((item) => (
+                  <div className="ec-base-prdInfo">
+                    <div className="prdBox">
+                      <div className="thumbnail">
+                        <Link to={`/productdetail/${item.id}`}>
+                          <img
+                            src={`http://localhost:3000/assets/imgs/${item.image}`}
+                            width={71}
+                            height={71}
+                            alt=""
+                          />
+                        </Link>
+                      </div>
+                      <div className="description">
+                        <strong className="prdName" title="Product">
+                          <Link
+                            to={`/productdetail/${item.id}`}
+                            className="ec-product-name"
+                          >
+                            {item.productName}
+                          </Link>
+                        </strong>
+                        <ul className="info">
+                          <li>
+                            <span className="price" title="Price">
+                              <strong>
+                                {formatter.format(
+                                  (item.price -
+                                    item.price * (0.01 * item.sale)) *
+                                    item.quantity
+                                )}
+                              </strong>
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                  </li>
-                </ul>
-                <div className="prdFoot" title="Order Status">
-                  <div className="gLeft">
-                    <span className="store" />
-                    <span className="addition displaynone">
-                      <strong className="cancel">
-                        <a href="order_detail_cs.html" target="_blank">
-                          [Thông tin chi tiết]
-                        </a>
-                      </strong>
-                    </span>
-                  </div>
-                  <div className="gRight">
-                    <span className="displaynone">
-                      <Link to="/order" className="line btnNormal mini">
-                        Theo Dõi Đơn Hàng
-                      </Link>
-                    </span>
-                    <a
-                      href="/board/product/write.html"
-                      className="btnNormal mini displaynone"
-                    >
-                      Đánh Giá
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                  </div>
-                </div>
-                <div className="request displaynone">
-                  <a href="#none" className="displaynone btnNormal">
-                    Huỷ Đơn Hàng
-                  </a>
-                  <a href="cancel.html" className="displaynone btnNormal">
-                    Yêu Cầu Hủy
-                  </a>
-                  <a href="exchange.html" className="displaynone btnNormal">
-                    Yêu Cầu Đổi Hàng
-                  </a>
-                  <a href="return.html" className="displaynone btnNormal">
-                    Yêu Cầu Trả Hàng
-                  </a>
-                </div>
-              </div>
-              <a href="detail.html" className="btnDetail displaynone" />
-            </div>
-            <div className="order order_borderdisplaynone">
-              <h3 className="displaynone">
-                <span className="number" title="Order No.">
-                  <a href="detail.html">Mã đơn hàng | </a>
-                </span>
-              </h3>
-              <p className="displaynone">
-                <span className="date" title="Order Date" />
-              </p>
-              <div className="ec-base-prdInfo">
-                <div className="prdBox">
-                  <div className="thumbnail">
-                    <a href="/product/detail.html">
-                      <img src width={71} height={71} alt="" />
-                    </a>
-                  </div>
-                  <div className="description">
-                    <strong className="prdName" title="Product" />
-                    <ul className="info">
-                      <li>
-                        <span className="price" title="Price">
-                          <strong />
-                          <span className="refer displaynone"> </span>
-                        </span>
-                        <span className="ec-base-qty" title="Quantity">
-                          <strong /> sản phẩm
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <ul className="xans-element- xans-myshop xans-myshop-optionset option">
-                  <li className>
-                    <div className="name">
-                      <strong className="optionDesc" /> ( sản phẩm)
+                    <div className="prdFoot" title="Order Status">
+                      <div className="gLeft">
+                        {order.status} <span className="store" />
+                      </div>
                     </div>
-                  </li>
-                </ul>
-                <div className="prdFoot" title="Order Status">
-                  <div className="gLeft">
-                    <span className="store" />
-                    <span className="addition displaynone">
-                      <strong className="cancel">
-                        <a href="order_detail_cs.html" target="_blank">
-                          [Thông tin chi tiết]
-                        </a>
-                      </strong>
-                    </span>
                   </div>
-                  <div className="gRight">
-                    <span className="displaynone">
-                    <Link to="/order" className="line btnNormal mini">
-                        Theo Dõi Đơn Hàng
-                      </Link>
-                    </span>
-                    <a
-                      href="/board/product/write.html"
-                      className="btnNormal mini displaynone"
-                    >
-                      Đánh Giá
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                    <a href="#none" className="btnNormal mini displaynone">
-                      Rút Lại Yêu Cầu
-                    </a>
-                  </div>
-                </div>
-                <div className="request displaynone">
-                  <a href="#none" className="displaynone btnNormal">
-                    Huỷ Đơn Hàng
-                  </a>
-                  <a href="cancel.html" className="displaynone btnNormal">
-                    Yêu Cầu Hủy
-                  </a>
-                  <a href="exchange.html" className="displaynone btnNormal">
-                    Yêu Cầu Đổi Hàng
-                  </a>
-                  <a href="return.html" className="displaynone btnNormal">
-                    Yêu Cầu Trả Hàng
-                  </a>
-                </div>
+                ))}
               </div>
-              <a href="detail.html" className="btnDetail displaynone" />
-            </div>
+            ))}
           </div>
-          <p className="empty">Bạn không có lịch sử đặt hàng.</p>
+          <p className="empty displaynone">Bạn không có lịch sử đặt hàng.</p>
         </div>
-        <div className="xans-element- xans-myshop xans-myshop-orderhistorypaging displaynone ec-base-paginate">
-          <a
-            href="?page=1&history_start_date=2022-12-16&history_end_date=2023-03-16&past_year=2022"
-            className="btnPrev"
-          >
-            <i className="fa-solid fa-angle-left" />
-          </a>
-          <ol>
-            <li className="xans-record-">
-              <a
-                href="?page=1&history_start_date=2022-12-16&history_end_date=2023-03-16&past_year=2022"
-                className="this"
-              >
-                1
-              </a>
-            </li>
-          </ol>
-          <a
-            href="?page=1&history_start_date=2022-12-16&history_end_date=2023-03-16&past_year=2022"
-            className="btnNext"
-          >
-            <i className="fa-solid fa-angle-right" />
-          </a>
+        <div className="xans-product xans-product-normalpaging ec-base-paginate">
+          <ol>{renderPageNumbers}</ol>
         </div>
       </div>
     </div>

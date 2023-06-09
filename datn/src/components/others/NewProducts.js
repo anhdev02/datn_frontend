@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AddCart } from '../../store/action/cart';
-import {store} from '../../store/store'
+import { AddCart } from "../../store/action/cart";
+import { store } from "../../store/store";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -14,19 +15,29 @@ const NewProducts = () => {
   const [newProducts, setNewProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [productFavorites, setProductFavorites] = useState([]);
+  const userId = localStorage.getItem("id");
   useEffect(() => {
     fetch("http://localhost:8080/api/product/new/36")
       .then((res) => res.json())
       .then((data) => setNewProducts(data))
       .catch((err) => console.log(err));
+      fetchFavoriteProducts();
   }, []);
+
+  const productIds = productFavorites.map((favorite) => favorite.productId);
+
+  const updatedProducts = newProducts.map((product) => {
+    const icon_status = productIds.includes(product.id) ? "on" : "off";
+    return { ...product, icon_status };
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = newProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = updatedProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(newProducts.length / itemsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(updatedProducts.length / itemsPerPage); i++) {
     pageNumbers.push(i);
   }
 
@@ -39,19 +50,91 @@ const NewProducts = () => {
     const activeClass = number === currentPage ? "this" : "other";
     return (
       <li>
-        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+        <Link onClick={handleClick} id={number} to="" className={activeClass}>
           {number}
-        </a>
+        </Link>
       </li>
     );
   });
 
+  const fetchFavoriteProducts = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/favorite/user/${userId}`
+      );
+      setProductFavorites(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sản phẩm yêu thích:", error);
+    }
+  };
+
+  const handleImageClick = async (product) => {
+    if (product.icon_status === "on") {
+      removeFromFavorites(userId, product.id);
+    } else {
+      addToFavorites(userId, product.id);
+    }
+  };
+
+  const addToFavorites = async (userId, productId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/favorite/add",
+        {
+          userId: userId,
+          productId: productId,
+        }
+      );
+
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: 1,
+        }
+      );
+
+      const favoriteId = response.data.id;
+      fetchFavoriteProducts();
+      return favoriteId;
+    } catch (error) {
+      console.error("Lỗi khi thêm vào danh sách yêu thích:", error);
+    }
+  };
+
+  const removeFromFavorites = async (userId, productId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/favorite/${userId}/${productId}`
+      );
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: -1,
+        }
+      );
+      fetchFavoriteProducts();
+    } catch (error) {
+      console.error("Lỗi khi xóa khỏi danh sách yêu thích:", error);
+    }
+  };
+
   function addToCartClickHandle(id, name, image, price, sale, quantity) {
-    if(quantity===0) {
-      toast.error('Đã hết sản phẩm',{position: "bottom-left"});
-    }else {
-      store.dispatch(AddCart({id: id, name: name, quantity: 1, price: price, sale: sale, image: image}));
-      toast.success('Đã thêm sản phẩm vào giỏ hàng',{position: "bottom-left"});
+    if (quantity === 0) {
+      toast.error("Đã hết sản phẩm", { position: "bottom-left" });
+    } else {
+      store.dispatch(
+        AddCart({
+          id: id,
+          name: name,
+          quantity: 1,
+          price: price,
+          sale: sale,
+          image: image,
+        })
+      );
+      toast.success("Đã thêm sản phẩm vào giỏ hàng", {
+        position: "bottom-left",
+      });
     }
   }
 
@@ -114,7 +197,16 @@ const NewProducts = () => {
                                           src="assets/imgs/btn_list_cart.gif"
                                           alt="Thêm vào giỏ hàng"
                                           style={{ cursor: "pointer" }}
-                                          onClick={() => addToCartClickHandle(product.id, product.productName, product.image, product.price, product.sale, product.quantity)}
+                                          onClick={() =>
+                                            addToCartClickHandle(
+                                              product.id,
+                                              product.productName,
+                                              product.image,
+                                              product.price,
+                                              product.sale,
+                                              product.quantity
+                                            )
+                                          }
                                           className="ec-admin-icon cart"
                                         />
                                       </span>
@@ -131,7 +223,11 @@ const NewProducts = () => {
                                           src="assets/imgs/btn_wish_before.png"
                                           className="icon_img ec-product-listwishicon"
                                           alt="Trước đăng ký Sản phẩm yêu thích"
-                                          icon_status="off"
+                                          style={{ cursor: "pointer" }}
+                                          icon_status={product.icon_status}
+                                          onClick={() =>
+                                            handleImageClick(product)
+                                          }
                                         />
                                       </span>
                                     </div>
@@ -202,61 +298,14 @@ const NewProducts = () => {
                 </article>
               </div>
               <div className="xans-product xans-product-normalpaging ec-base-paginate">
-                <ol>
-                  {renderPageNumbers}
-                </ol>
+                <ol>{renderPageNumbers}</ol>
               </div>
             </div>
           </div>
         </div>
         <hr className="layout" />
       </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="#st">1</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <ul>
-            <li className="displaynone xans-record-">
-              <a href="#st">
-                <img src="#" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-            <li className="displaynone xans-record-">
-              <a href="#st">
-                <img src="#" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-          </ul>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <a href="#header" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </a>
-        </p>
-      </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

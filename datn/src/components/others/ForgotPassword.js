@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
+import { Email, Item, A } from "react-html-email";
+import ReactDOMServer from "react-dom/server";
 
 var emailBody = "";
 const ForgotPassword = () => {
@@ -15,14 +17,37 @@ const ForgotPassword = () => {
       fetch(`http://localhost:8080/api/user/email/${email}`)
         .then((res) => res.json())
         .then((data) => {
-          emailBody = `
-          Xin chào,
-          Bạn đã yêu cầu đặt lại mật khẩu. Nhấp vào nút bên dưới để tiếp tục quá trình đặt lại mật khẩu:
-          http://localhost:3000/resetpassword/${tokenCode}?userId=${data.id}
-          Nếu bạn không yêu cầu đặt lại mật khẩu, xin vui lòng bỏ qua email này.
-          Trân trọng,
-          Đội ngũ hỗ trợ của chúng tôi
-        `;
+          console.log(data);
+          emailBody = ReactDOMServer.renderToString(
+            <Email title="Thông báo">
+              <Item>
+                <p>Xin chào,</p>
+                <p>
+                  Bạn đã yêu cầu đặt lại mật khẩu. Nhấp vào liên kết bên dưới để
+                  tiếp tục quá trình đặt lại mật khẩu:
+                </p>
+              </Item>
+              <Item>
+                <p>
+                  <a
+                    href={`http://localhost:3000/resetpassword/${tokenCode}?userId=${data.id}`}
+                  >
+                    Đặt lại mật khẩu
+                  </a>
+                </p>
+              </Item>
+              <Item>
+                <p>
+                  Nếu bạn không yêu cầu đặt lại mật khẩu, xin vui lòng bỏ qua
+                  email này.
+                </p>
+              </Item>
+              <Item>
+                <p>Trân trọng,</p>
+                <p>Đội ngũ hỗ trợ của chúng tôi</p>
+              </Item>
+            </Email>
+          );
           var myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
 
@@ -30,6 +55,7 @@ const ForgotPassword = () => {
             emailAddress: email,
             emailSubject: "Quên mật khẩu",
             emailBody: emailBody,
+            emailContentType: "text/html",
           });
 
           var requestOptions = {

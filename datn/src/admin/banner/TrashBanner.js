@@ -4,20 +4,22 @@ import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 
 const TrashBanner = () => {
-  var url = "http://localhost:8080/api/banner/trash";
   const [banner, setBanner] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   useEffect(() => {
-    fetch(url)
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/banner/trash')
     .then((res) => res.json())
     .then((data) => {
       setBanner(data);
       setCurrentPage(1);
     })
     .catch((err) => console.log(err));
-  }, [isDeleted]);
+  }
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -63,10 +65,12 @@ const TrashBanner = () => {
 
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+          console.log(result);
+          toast.success("Banner đã được khôi phục!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-        toast.success("Banner đã được khôi phục!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
   }
 
   const Delete = async (event) => {
@@ -95,9 +99,11 @@ const TrashBanner = () => {
             })
           }
         })
-        .then(result => console.log(result))
+        .then(result => {
+          console.log(result);
+          loadData();
+        })
         .catch(error => console.log('error', error));
-        setIsDeleted(!isDeleted);
     }
   }
   return (

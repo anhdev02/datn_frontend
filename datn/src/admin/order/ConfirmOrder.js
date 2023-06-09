@@ -1,24 +1,26 @@
-import axios from 'axios';
 import React, { useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import { confirm } from "react-confirm-box";
 
 const ConfirmOrder = () => {
-  var url = "http://localhost:8080/api/order/confirm"
   const [order, setOrder] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+
   useEffect(()=>{
-    axios.get(url)
-    .then(res=>{
-      setOrder(res.data)
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/order/confirm')
+    .then((res) => res.json())
+    .then((data) => {
+      setOrder(data);
     })
-    .catch(err=>{
-      console.log(err)
-    })
-  }, [isDeleted]);
+    .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -55,10 +57,12 @@ const ConfirmOrder = () => {
 
     fetch(url, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) =>{
+        console.log(result);
+        toast.success("Đã cập nhật trạng thái đơn hàng!", { position: "top-right" });
+        loadData();
+      })
       .catch((error) => console.log("error", error));
-      toast.success("Đã cập nhật trạng thái đơn hàng!", { position: "top-right" });
-      setIsDeleted(!isDeleted);
   };
 
   const renderPageNumbers = pageNumbers.map((number) => {
@@ -93,10 +97,12 @@ const ConfirmOrder = () => {
   
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) =>{
+          console.log(result);
+          toast.success("Đã xóa tạm thời đơn hàng!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-        toast.success("Đã xóa tạm thời đơn hàng!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
     }
     
   }

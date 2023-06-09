@@ -7,17 +7,20 @@ import PayRes from '../others/PayRes';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import '../assets/scss/displaynone_1925.scss'
+import '../assets/scss/body_14306.scss'
 import '../assets/scss/xans_layout_statelogoff_19480.scss'
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const PayPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
-  const {abc} = useParams();
+  useEffect(() => {
+    document.title = 'Thanh toán';
+  }, [])
   return (
     isTablet ?
-    <div id="wrap">
+    <div id="wrap" className='displaynone_1925 body_14306'>
         <div id="container">
-          <HeaderAccountRes/>
+          <HeaderAccountRes title="Thanh toán"/>
           <PayRes/>
           <FooterRes/>
       </div>
@@ -26,7 +29,7 @@ const PayPage = () => {
     <div className='index displaynone_1925 xans_layout_statelogoff_19480'>
       <div id="userStyle">
         <Header/>
-        <Pay abc = {abc}/>
+        <Pay/>
         <Footer/>
       </div>
     </div>

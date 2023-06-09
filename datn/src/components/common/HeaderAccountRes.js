@@ -246,22 +246,13 @@ const HeaderAccountRes = (props) => {
         </div>
         <div className="xans-element- xans-myshop xans-myshop-main ">
           <Link to="/favouriteslist" className="wishList">
-            Yêu Thích{" "}
-            <span>
-              <span className="xans_myshop_main_interest_prd_cnt">2</span>
-            </span>
+            Yêu Thích
           </Link>
           <Link to="/seen" className="recentList">
-            Đã Xem{" "}
-            <span>
-              <span className="xans_myshop_main_recent_cnt">2</span>
-            </span>
+            Đã Xem
           </Link>
           <Link to="/order" className="orderList">
-            Đơn hàng{" "}
-            <span className="xans-element- xans-myshop xans-myshop-orderhistorytab ">
-              <span id="xans_myshop_total_orders" />
-            </span>
+            Đơn hàng
           </Link>
         </div>
         <Link onClick={handleClick} to="" className="btnClose">
@@ -291,6 +282,7 @@ const HeaderAccountRes = (props) => {
             <Link to="/account">My page</Link>
           </div>
         </div>
+        
         <div className={showSearch ? `searchWrap` : `searchWrap displaynone`}>
           <form id="searchBarForm" onSubmit={handleSearch}>
             <div className="xans-element- xans-layout xans-layout-searchheader">

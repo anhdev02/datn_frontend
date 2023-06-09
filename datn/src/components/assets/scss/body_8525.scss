@@ -1124,19 +1124,16 @@
         }
         .sub-header {
             .category {
-                left: 40px;
+                left: 15px;
                 width: 30px;
             }
         }
         .searchWrap {
-            position: absolute;
-            top: 85px;
+            position: relative;
+            top: -5px;
             left: 0;
             width: 100%;
-            height: 120px;
-            padding: 40px 30px;
-            visibility: hidden;
-            opacity: 0;
+            height: 50px;
             transform: translateY(30%);
             transition: all 0.3s ease;
             z-index: -1;

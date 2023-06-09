@@ -10,15 +10,20 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderAccountRes from '../common/HeaderAccountRes'
 import AccountInfoRes from '../others/AccountInfoRes'
 import FooterRes from '../common/FooterRes'
+import { Helmet } from 'react-helmet'
+import { useEffect } from 'react'
 
 
 const AccountInfoPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Thông tin tài khoản';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='fr_view_888 displaynone_632 header_9943'>
         <div id="container">
-            <HeaderAccountRes/>
+            <HeaderAccountRes title="Thông tin tài khoản"/>
             <AccountInfoRes/>
             <FooterRes/>
         </div>

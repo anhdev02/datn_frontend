@@ -9,6 +9,7 @@ const AddressBook = () => {
   const user = localStorage.getItem("username");
   const userId = parseInt(localStorage.getItem("id"), 10);
   const [orders, setOrders] = useState([]);
+  const [productFavorites, setProductFavorites] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
 
@@ -25,6 +26,11 @@ const AddressBook = () => {
       .then((data) => {
         setAddresses(data);
       })
+      .catch((err) => console.log(err));
+
+      fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
       .catch((err) => console.log(err));
   }, [isDeleted]);
 
@@ -46,12 +52,12 @@ const AddressBook = () => {
           response.text()
           if(response.ok){
             toast.success("Xóa thành công!", {
-              position: "top-right",
+              position: "bottom-left",
             });
             setIsDeleted(!isDeleted);
           }else{
             toast.error("Xóa không thành công!", {
-              position: "top-right",
+              position: "bottom-left",
             })
           }
         })
@@ -108,7 +114,7 @@ const AddressBook = () => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -116,9 +122,6 @@ const AddressBook = () => {
                     </li>
                     <li className="my_li4">
                       <Link to="/seen">Đã xem</Link>
-                    </li>
-                    <li style={{ display: "none" }} className="my_li6">
-                      <Link to="">Nhận xét của tôi</Link>
                     </li>
                     <li className="my_li7">
                       <Link to="/accountinfo">Thông tin tài khoản</Link>
@@ -137,49 +140,6 @@ const AddressBook = () => {
                   </span>
                 </div>
                 <form id="frmAddr" method="post">
-                  <input
-                    id="__address_addr1"
-                    name="__address_addr1"
-                    type="hidden"
-                  />
-                  <input id="__city_name" name="__city_name" type="hidden" />
-                  <input id="__state_name" name="__state_name" type="hidden" />
-                  <input
-                    id="__isRuleBasedAddrForm"
-                    name="__isRuleBasedAddrForm"
-                    type="hidden"
-                  />
-                  <input
-                    id="__use_foreign_country_list"
-                    name="__use_foreign_country_list"
-                    defaultValue="T"
-                    type="hidden"
-                  />
-                  <input
-                    id="__ma_rcv_contry_code"
-                    name="__ma_rcv_contry_code"
-                    type="hidden"
-                  />
-                  <input id="__country" name="__country" type="hidden" />
-                  <input id="__province" name="__province" type="hidden" />
-                  <input id="__city" name="__city" defaultValue type="hidden" />
-                  <input id="__district" name="__district" type="hidden" />
-                  <input
-                    id="is_display_phone"
-                    name="is_display_phone"
-                    type="hidden"
-                  />
-                  <input
-                    id="is_display_mobile"
-                    name="is_display_mobile"
-                    type="hidden"
-                  />
-                  <input
-                    id="sUseCountryNumberFlag"
-                    name="sUseCountryNumberFlag"
-                    defaultValue="T"
-                    type="hidden"
-                  />
                   <div className="xans-element- xans-myshop xans-myshop-addrlist">
                     <div className="ec-base-table typeList">
                       <table border={1} summary className="addr-table">
@@ -239,21 +199,7 @@ const AddressBook = () => {
                             ))
                           }
                         </tbody>
-                        <tbody className="displaynone">
-                          <tr>
-                            <td colSpan={7} className="message">
-                              Sổ địa chỉ của bạn hiện đang trống.
-                            </td>
-                          </tr>
-                        </tbody>
                       </table>
-                    </div>
-                    <div className="ec-base-button">
-                      <span className="gRight" style={{ display: "none" }}>
-                        <Link to="" className="btnSubmitFix sizeS">
-                          Thêm
-                        </Link>
-                      </span>
                     </div>
                   </div>
                 </form>
@@ -284,37 +230,6 @@ const AddressBook = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <Link to="">0</Link> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
       </div>
       <ToastContainer />
     </div>

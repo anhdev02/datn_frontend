@@ -33,41 +33,59 @@ import PayPage from '../components/pages/PayPage'
 import NewAddressPage from '../components/pages/NewAddressPage'
 import EditAddressPage from '../components/pages/EditAddressPage'
 import ResetPasswordPage from '../components/pages/ResetPasswordPage'
+import RecipePage from '../components/pages/RecipePage'
+import RecipeDetailPage from '../components/pages/RecipeDetailPage'
+import GuidePage from '../components/pages/GuidePage'
+import LNLTVPage from '../components/pages/LNLTVPage'
+import LNLTVDetailPage from '../components/pages/LNLTVDetailPage'
 
 const AppRoute = () => {
   return (
     <Routes>
         <Route path='/' element={<HomePage/>}></Route>
         <Route path='/dashboard/*' element={<AdminTemplate/>}></Route>
+        <Route path='/print/:id' element={<PrintOrder/>}></Route>
+
+        <Route path='/search' element={<SearchPage/>}></Route>
+        <Route path='/newproducts' element={<NewProductsPage/>}></Route>
+        <Route path='/dealhot' element={<DealHotPage/>}></Route>
+        <Route path='/bestseller' element={<BestSellerPage/>}></Route>
+        <Route path='/productbycategory/:id' element={<ProductByCategoryPage/>}></Route>
+        <Route path='/productbycategoryparent/:id' element={<ProductByCategoryParentPage/>}></Route>
+        <Route path='/productdetail/:id' element={<ProductDetailPage/>}></Route>
+        
+        <Route path='/cart' element={<CartPage/>}></Route>
+        <Route path='/pay' element={<PayPage/>}></Route>
+
+        <Route path='/favouriteslist' element={<FavouritesListPage/>}></Route>
+        <Route path='/seen' element={<SeenPage/>}></Route>
+
+        <Route path='/register' element={<RegisterPage/>}></Route>
+        <Route path='/login' element={<LoginPage/>}></Route>
+        <Route path='/forgotpassword' element={<ForgotPasswordPage/>}></Route>
+        <Route path='/resetpassword/:id' element={<ResetPasswordPage/>}></Route>
+
         <Route path='/account' element={<AccountPage/>}></Route>
         <Route path='/order' element={<OrderPage/>}></Route>
         <Route path='/addressbook' element={<AddressBookPage/>}></Route>
         <Route path='/newaddress' element={<NewAddressPage/>}></Route>
         <Route path='/edit/address/:id' element={<EditAddressPage/>}></Route>
-        <Route path='/favouriteslist' element={<FavouritesListPage/>}></Route>
-        <Route path='/seen' element={<SeenPage/>}></Route>
         <Route path='/accountinfo' element={<AccountInfoPage/>}></Route>
-        <Route path='/search' element={<SearchPage/>}></Route>
-        <Route path='/login' element={<LoginPage/>}></Route>
-        <Route path='/forgotpassword' element={<ForgotPasswordPage/>}></Route>
-        <Route path='/resetpassword/:id' element={<ResetPasswordPage/>}></Route>
-        <Route path='/register' element={<RegisterPage/>}></Route>
-        <Route path='/cart' element={<CartPage/>}></Route>
-        <Route path='/dealhot' element={<DealHotPage/>}></Route>
-        <Route path='/bestseller' element={<BestSellerPage/>}></Route>
-        <Route path='/newproducts' element={<NewProductsPage/>}></Route>
-        <Route path='/productbycategory/:id' element={<ProductByCategoryPage/>}></Route>
-        <Route path='/productbycategoryparent/:id' element={<ProductByCategoryParentPage/>}></Route>
-        <Route path='/story' element={<StoryPage/>}></Route>
+
         <Route path='/stores' element={<StoresPage/>}></Route>
         <Route path='/customercare' element={<CustomerCarePage/>}></Route>
         <Route path='/policy' element={<PolicyPage/>}></Route>
-        <Route path='/productdetail/:id' element={<ProductDetailPage/>}></Route>
         <Route path='/aboutus' element={<AboutUsPage/>}></Route>
-        <Route path='/res' element={<HomeResPage/>}></Route>
         <Route path='/termsconditions' element={<TermsConditionsPage/>}></Route>
-        <Route path='/print/:id' element={<PrintOrder/>}></Route>
-        <Route path='/pay' element={<PayPage/>}></Route>
+
+        <Route path='/recipe' element={<RecipePage/>}></Route>
+        <Route path='/recipe/:id' element={<RecipeDetailPage/>}></Route>
+        <Route path='/productguide' element={<GuidePage/>}></Route>
+        <Route path='/locknlocktv' element={<LNLTVPage/>}></Route>
+        <Route path='/locknlocktv/:id' element={<LNLTVDetailPage/>}></Route>
+        <Route path='/story' element={<StoryPage/>}></Route>
+        
+        <Route path='/res' element={<HomeResPage/>}></Route>
         <Route path='*' element={<ErrorPage/>}></Route>
 
     </Routes>

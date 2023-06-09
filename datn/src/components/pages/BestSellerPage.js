@@ -6,9 +6,13 @@ import Header from '../common/Header'
 import HeaderRes from '../common/HeaderRes'
 import BestSeller from '../others/BestSeller'
 import BestSellerRes from '../others/BestSellerRes'
+import { useEffect } from 'react'
 
 const BestSellerPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Sản phẩm bán chạy';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_7866'>

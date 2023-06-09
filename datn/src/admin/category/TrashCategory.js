@@ -5,12 +5,10 @@ import { confirm } from "react-confirm-box";
 
 
 const TrashCategory = () => {
-  var url = "http://localhost:8080/api/category/trash";
   const [allCat, setAllCat] = useState([]);
   const [category, setCategory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
-  const [isDeleted, setIsDeleted] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/category/all")
@@ -19,17 +17,17 @@ const TrashCategory = () => {
       setAllCat(data);
     })
     .catch((err) => console.log(err));
+    loadData();
   }, []);
   
-  useEffect(() => {
-    fetch(url)
+  const loadData = () => {
+    fetch('http://localhost:8080/api/category/trash')
     .then((res) => res.json())
     .then((data) => {
       setCategory(data);
-      setCurrentPage(1);
     })
     .catch((err) => console.log(err));
-  }, [isDeleted]);
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -75,10 +73,12 @@ const TrashCategory = () => {
 
     fetch(url, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) =>{
+        console.log(result);
+        loadData();
+        toast.success("Danh mục đã được khôi phục!", { position: "top-right" });
+      })
       .catch((error) => console.log("error", error));
-      toast.success("Danh mục đã được khôi phục!", { position: "top-right" });
-      setIsDeleted(!isDeleted);
   }
   const Delete = async (event) => {
     event.preventDefault();
@@ -106,9 +106,11 @@ const TrashCategory = () => {
             })
           }
         })
-        .then(result => console.log(result))
+        .then(result =>{
+          console.log(result);
+          loadData();
+        })
         .catch(error => console.log('error', error));
-        setIsDeleted(!isDeleted);
     }
   }
   return (

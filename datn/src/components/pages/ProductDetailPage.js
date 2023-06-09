@@ -10,17 +10,21 @@ import HeaderAccountRes from '../common/HeaderAccountRes'
 import ProductDetailRes from '../others/ProductDetailRes'
 import FooterRes from '../common/FooterRes'
 import { useParams } from 'react-router-dom'
+import { useEffect } from 'react'
 
 
 const ProductDetailPage = () => {
   const {id} = useParams();
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Chi tiết sản phẩm';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='fr_view_888 displaynone_632 html_14713'>
       <div id="container">
-          <HeaderAccountRes/>
-          <ProductDetailRes/>
+          <HeaderAccountRes title='Chi tiết sản phẩm'/>
+          <ProductDetailRes id={id}/>
           <FooterRes/>
       </div>
   </div>

@@ -78,7 +78,7 @@
 
 .app-brand .layout-menu-toggle {
   position: absolute;
-  left: 15rem;
+  left: 23rem;
   border-radius: 50%;
 }
 .app-brand .layout-menu-toggle i {
@@ -87,9 +87,6 @@
   transition: all 0.3s ease-in-out;
 }
 @media (max-width: 1199.98px) {
-  .app-brand .layout-menu-toggle {
-    display: none !important;
-  }
   .layout-menu-expanded .app-brand .layout-menu-toggle {
     display: block !important;
   }

@@ -3,22 +3,22 @@ import { ToastContainer, toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 const ListSlide = () => {
-  
-  var url = "http://localhost:8080/api/slide/list";
   const [slide, setSlide] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
-    fetch(url)
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/slide/list')
     .then((res) => res.json())
     .then((data) => {
       setSlide(data);
-      setCurrentPage(1);
     })
     .catch((err) => console.log(err));
-  }, [isDeleted]);
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -66,10 +66,12 @@ const ListSlide = () => {
 
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+          console.log(result);
+          toast.success("Đã xóa tạm thời slide!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-        toast.success("Đã xóa tạm thời slide!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
     } 
   }
   return (

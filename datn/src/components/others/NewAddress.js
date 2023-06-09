@@ -30,6 +30,7 @@ const NewAddress = () => {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
+  const [productFavorites, setProductFavorites] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +39,11 @@ const NewAddress = () => {
       .then((data) => {
         setOrders(data);
       })
+      .catch((err) => console.log(err));
+
+      fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
       .catch((err) => console.log(err));
   }, []);
  
@@ -86,22 +92,22 @@ const NewAddress = () => {
     const pattern =
       /^\s*[\p{L}\d\s]+,\s*[\p{L}\d\s]+$/u;
     if (phone === " ") {
-      toast.error("Vui lòng nhập số điện thoại", { position: "top-right" });
+      toast.error("Vui lòng nhập số điện thoại", { position: "bottom-left" });
     } else if (phone.length !== 9) {
       toast.error("Vui lòng nhập đúng định dạng số điện thoại", {
-        position: "top-right",
+        position: "bottom-left",
       });
     }else if(selectedProvince === '') {
-      toast.error("Vui lòng chọn Tỉnh/Thành", { position: "top-right" });
+      toast.error("Vui lòng chọn Tỉnh/Thành", { position: "bottom-left" });
     }else if(selectedDistrict === '') {
-      toast.error("Vui lòng chọn Quận/Huyện", { position: "top-right" });
+      toast.error("Vui lòng chọn Quận/Huyện", { position: "bottom-left" });
     }else if(selectedWard === '') {
-      toast.error("Vui lòng chọn Phường/Xã", { position: "top-right" });
+      toast.error("Vui lòng chọn Phường/Xã", { position: "bottom-left" });
     }else if (address === undefined) {
-      toast.error("Vui lòng nhập địa chỉ", { position: "top-right" });
+      toast.error("Vui lòng nhập địa chỉ", { position: "bottom-left" });
     } else if (!pattern.test(address)) {
       toast.error("Vui lòng nhập đúng định dạng địa chỉ", {
-        position: "top-right",
+        position: "bottom-left",
       });
     } else {
       const addressParts = address.split(",");
@@ -132,12 +138,12 @@ const NewAddress = () => {
         .then((response) => {
           if (response.ok) {
             toast.success("Thêm địa chỉ thành công!", {
-              position: "top-right",
+              position: "bottom-left",
             });
             setTimeout(() => navigate("/addressbook"), 1000);
           } else {
             toast.error("Thêm địa chỉ không thành công!", {
-              position: "top-right",
+              position: "bottom-left",
             });
           }
           response.text();
@@ -195,7 +201,7 @@ const NewAddress = () => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -203,9 +209,6 @@ const NewAddress = () => {
                     </li>
                     <li className="my_li4">
                       <Link to="/seen">Đã xem</Link>
-                    </li>
-                    <li style={{ display: "none" }} className="my_li6">
-                      <Link to="">Nhận xét của tôi</Link>
                     </li>
                     <li className="my_li7">
                       <Link to="/accountinfo">Thông tin tài khoản</Link>
@@ -219,17 +222,8 @@ const NewAddress = () => {
                 </div>
                 <form
                   id="frmAddr"
-                  name
-                  action="/exec/front/Myshop/Addr/?mode=Insert&return_url=%2Fmyshop%2Faddr%2Flist.html"
-                  method="post"
-                  target="_self"
-                  encType="multipart/form-data"
                 >
                   <div className="xans-element- xans-myshop xans-myshop-addrregister ">
-                    {/*
-                $return_url = /myshop/addr/list.html
-                $isRuleBasedAddrForm = T
-            */}
                     <div className="ec-base-table typeWrite">
                       <table border={1} summary>
                         <caption>Thêm Địa Chỉ</caption>
@@ -243,7 +237,7 @@ const NewAddress = () => {
                               Số điện thoại di động{" "}
                               <span>
                                 <img
-                                  src="//img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif"
+                                  src="http://localhost:3000/assets/imgs/ico_required_blue.gif"
                                   alt="Required"
                                 />
                               </span>
@@ -265,7 +259,7 @@ const NewAddress = () => {
                             <th scope="row">
                               Địa Chỉ{" "}
                               <img
-                                src="//img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif"
+                                src="http://localhost:3000/assets/imgs/ico_required_blue.gif"
                                 alt="Required"
                               />
                             </th>
@@ -320,6 +314,7 @@ const NewAddress = () => {
                                     className="inputTypeText"
                                     type="text"
                                     size={60}
+                                    required
                                     onChange={(e) => setAddress(e.target.value)}
                                     maxLength={255}
                                   />
@@ -331,14 +326,14 @@ const NewAddress = () => {
                       </table>
                     </div>
                     <div className="ec-base-button">
-                      <a
-                        href="#st"
+                      <Link
+                        to=""
                         className="btnBlack btn150"
                         onClick={handleSubmitAddress}
                         onclick="myshopAddr.formCheck();"
                       >
                         Lưu
-                      </a>
+                      </Link>
                       <Link to="/addressbook" className="btnWhite btn150">
                         Hủy
                       </Link>
@@ -372,37 +367,6 @@ const NewAddress = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <Link to="">0</Link> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
       </div>
       <ToastContainer />
     </div>

@@ -1,26 +1,25 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 import { ToastContainer, toast } from "react-toastify";
 
 const ListOrder = () => {
-  var url = "http://localhost:8080/api/order/list";
   const [order, setOrder] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
-    axios
-      .get(url)
-      .then((res) => {
-        setOrder(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [isDeleted]);
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/order/list')
+    .then((res) => res.json())
+    .then((data) => {
+      setOrder(data);
+    })
+    .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -69,10 +68,12 @@ const ListOrder = () => {
   
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) =>{
+          console.log(result);
+          toast.success("Đã xóa tạm thời đơn hàng!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-        toast.success("Đã xóa tạm thời đơn hàng!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
     }
 
   }

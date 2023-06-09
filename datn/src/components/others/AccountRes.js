@@ -1,7 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 
 const AccountRes = () => {
+  const userId = localStorage.getItem("id");
+  const user = localStorage.getItem("username");
+  const [orders, setOrders] = useState([]);
+  const [trashOrders, setTrashOrders] = useState([]);
+  const [productFavorites, setProductFavorites] = useState([]);
+  const [status01, setStatus01] = useState(0);
+  const [status02, setStatus02] = useState(0);
+  const [status03, setStatus03] = useState(0);
+  const [status04, setStatus04] = useState(0);
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/order/user/${user}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(data);
+        loadOrderStatus(data);
+      })
+      .catch((err) => console.log(err));
+
+    fetch(`http://localhost:8080/api/order/usertrash/${user}`)
+      .then((res) => res.json())
+      .then((data) => setTrashOrders(data))
+      .catch((err) => console.log(err));
+
+    fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  const loadOrderStatus = (order) => {
+    let count01 = 0;
+    let count02 = 0;
+    let count03 = 0;
+    let count04 = 0;
+    order.forEach((element) => {
+      if (element.status === "Chờ Thanh Toán") {
+        count01++;
+      } else if (element.status === "Chuẩn Bị Giao Hàng") {
+        count02++;
+      } else if (element.status === "Đang Vận Chuyển") {
+        count03++;
+      } else if (element.status === "Đã Giao") {
+        count04++;
+      }
+    });
+    setStatus01(count01);
+    setStatus02(count02);
+    setStatus03(count03);
+    setStatus04(count04);
+  };
 
   if (localStorage.getItem("id")===null) {
     return <Navigate to="/login" />;
@@ -9,261 +59,20 @@ const AccountRes = () => {
   return (
     <div id="contents">
       <div className="root_width myshop_width">
-        <style
-          dangerouslySetInnerHTML={{
-            __html:
-              "\n              #topArea {\n                display: none;\n              }\n              #container {\n                padding-top: 55px;\n              }\n              #header .searchWrap {\n                top: 55px;\n              }\n            ",
-          }}
-        />
         <div className="clearBoth">
           <div className="myshpp-index">
             <div className="myshpp-index-top">
               <h2>
                 Xin chào
                 <span className="xans-element- xans-layout xans-layout-statelogon">
-                  <span className="xans-member-var-name" />
+                  <span className="xans-member-var-name"> {user}</span>
                 </span>
               </h2>
-            </div>
-            <div className="xans-element- xans-myshop xans-myshop-asyncbenefit">
-              <div className="ec-base-box typeMember gMessage displaynone">
-                <div className="information">
-                  <p className="thumbnail">
-                    <img
-                      src
-                      alt=""
-                      className="myshop_benefit_group_image_tag"
-                    />
-                  </p>
-                  <div className="description">
-                    <span>
-                      Cám ơn bạn đã mua sắm cùng chúng tôi.
-                      <strong className="txtEm">
-                        <span className="authssl_member_name">*****</span>
-                      </strong>
-                      Hạng thành viên của bạn là
-                      <strong>
-                        [
-                        <span className="displaynone">
-                          <img
-                            src
-                            alt=""
-                            className="myshop_benefit_group_icon_tag"
-                          />
-                        </span>
-                        <span className="xans-member-var-group_name" />
-                        <span className="myshop_benefit_ship_free_message" />]
-                      </strong>
-                      .
-                    </span>
-                    <p className="displaynone myshop_benefit_display_no_benefit">
-                      Nhận <span className="myshop_benefit_use_dc" /> của
-                      <strong className="txtEm">
-                        <span className="myshop_benefit_dc_price" />
-                        <span className="myshop_benefit_dc_type" />
-                      </strong>
-                      khi bạn mua hàng
-                      <strong className="txtEm">
-                        <span className="myshop_benefit_dc_pay" />
-                        <span className="myshop_benefit_dc_min_price" />
-                      </strong>
-                      . <span className="myshop_benefit_dc_max_percent" />
-                    </p>
-                    <p className="displaynone myshop_benefit_display_with_all">
-                      Nhận
-                      <span className="myshop_benefit_use_dc_mileage" />
-                      của
-                      <strong className="txtEm">
-                        <span className="myshop_benefit_dc_price_mileage" />
-                        <span className="myshop_benefit_dc_type_mileage" />
-                      </strong>
-                      khi bạn mua hàng
-                      <strong className="txtEm">
-                        <span className="myshop_benefit_dc_pay" />
-                        <span className="myshop_benefit_dc_min_price_mileage" />
-                      </strong>
-                      .
-                      <span className="myshop_benefit_dc_max_mileage_percent" />
-                    </p>
-                    <div className="displaynone gBlank5" id>
-                      <p className="displaynone">
-                        Mua <strong /> để được quảng cáo
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        .( : Tổng giá trị mua hàng )
-                      </p>
-                      <p className="displaynone">
-                        <strong /> thêm đơn hàng để quảng cáo
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        .( : Tổng Đơn)
-                      </p>
-                      <p className="displaynone">
-                        Mua <strong /> và địa điểm
-                        <strong /> thêm đơn hàng để quảng cáo
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        .( : Tổng giá trị mua hàng ｜Tổng đơn)
-                      </p>
-                      <p className="displaynone">
-                        Mua <strong /> và địa điểm
-                        <strong /> thêm đơn hàng để quảng cáo
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        .( : Tổng ｜Tổng đơn)
-                      </p>
-                      <p id className="displaynone">
-                        Mua <strong /> để duy trì
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        Cấp độ. ( : Tổng giá trị mua hàng )
-                      </p>
-                      <p id className="displaynone">
-                        <strong /> thêm đơn hàng để duy trì
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        Cấp độ. ( : Tổng giá trị mua hàng )
-                      </p>
-                      <p id className="displaynone">
-                        Mua <strong /> và địa điểm
-                        <strong /> thêm đơn hàng để duy trì
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        Cấp độ. ( : Tổng giá trị mua hàng )
-                      </p>
-                      <p id className="displaynone">
-                        Mua <strong /> hoặc địa điểm
-                        <strong /> thêm đơn hàng để duy trì
-                        <strong>
-                          [
-                          <span className="displaynone">
-                            <img src alt="" className />
-                          </span>
-                          ]
-                        </strong>
-                        Cấp độ. ( : Tổng giá trị mua hàng )
-                      </p>
-                      <p className="txtInfo txt11">
-                        Các khoản tiền được ước tính dựa trên chính sách thành
-                        viên. Các khoản này có thể khác với giá trị đơn hàng
-                        thực tế.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="invite ec-base-box typeThinBg gMerge displaynone">
-                <strong className="txtEm">
-                  Mời bạn bè đến với mall của chúng tôi qua đường link giới
-                  thiệu bạn bè.
-                </strong>
-                <p className="copy">
-                  <input type="text" id readOnly />
-                  <Link to="" className="btnSubmit">
-                    Sao chép
-                  </Link>
-                </p>
-                <ul>
-                  <li>- Bạn bè được giới thiệu sẽ nhận sau khi đăng ký.</li>
-                  <li>-</li>
-                </ul>
-              </div>
-            </div>
-            <div
-              style={{ display: "none" }}
-              className="xans-element- xans-myshop xans-myshop-asyncbankbook ec-base-box gHalf"
-            >
-              <ul>
-                <li className=" ">
-                  <strong className="title">Điểm thưởng khả dụng</strong>
-                  <strong className="data use">
-                    <span id="xans_myshop_bankbook_avail_mileage" />
-                  </strong>
-                  <Link to="" className="btnNormal">
-                    Kết quả
-                  </Link>
-                </li>
-                <li className>
-                  <strong className="title">Điểm thưởng số dư</strong>
-                  <strong className="data">
-                    <span id="xans_myshop_bankbook_total_mileage" />
-                  </strong>
-                </li>
-                <li className>
-                  <strong className="title">Điểm thưởng đã sử dụng</strong>
-                  <strong className="data">
-                    <span id="xans_myshop_bankbook_used_mileage" />
-                  </strong>
-                </li>
-                <li className="displaynone">
-                  <strong className="title" />
-                  <strong className="data use"> </strong>
-                  <Link to="" className="btnNormal">
-                    Kết quả
-                  </Link>
-                </li>
-                <li>
-                  <strong className="title">Đơn hàng</strong>
-                  <strong className="data">
-                    <span id="xans_myshop_bankbook_order_price" />(
-                    <span id="xans_myshop_bankbook_order_count" />
-                    đơn hàng)
-                  </strong>
-                </li>
-                <li className>
-                  <strong className="title">Mã giảm giá</strong>
-                  <strong className="data">
-                    <span id="xans_myshop_bankbook_coupon_cnt" />
-                    <span>Mã giảm giá</span>
-                  </strong>
-                  <Link to="" className="btnNormal">
-                    Kết quả
-                  </Link>
-                </li>
-              </ul>
             </div>
             <div className="xans-element- xans-myshop xans-myshop-orderstate">
               <div className="title">
                 <h3>
                   Tình trạng đơn hàng
-                  <span className="desc">
-                    (<em>3 tháng</em> gần đây)
-                  </span>
                 </h3>
               </div>
               <div className="state">
@@ -275,7 +84,7 @@ const AccountRes = () => {
                     </strong>
                     <Link to="" className="count">
                       <span id="xans_myshop_orderstate_shppied_before_count">
-                        0
+                      {status01}
                       </span>
                     </Link>
                   </li>
@@ -286,7 +95,7 @@ const AccountRes = () => {
                     </strong>
                     <Link to="" className="count">
                       <span id="xans_myshop_orderstate_shppied_standby_count">
-                        0
+                      {status02}
                       </span>
                     </Link>
                   </li>
@@ -297,7 +106,7 @@ const AccountRes = () => {
                     </strong>
                     <Link to="" className="count">
                       <span id="xans_myshop_orderstate_shppied_begin_count">
-                        0
+                      {status03}
                       </span>
                     </Link>
                   </li>
@@ -308,7 +117,7 @@ const AccountRes = () => {
                     </strong>
                     <Link to="" className="count">
                       <span id="xans_myshop_orderstate_shppied_complate_count">
-                        0
+                      {status04}
                       </span>
                     </Link>
                   </li>
@@ -319,7 +128,7 @@ const AccountRes = () => {
                     <strong>Đơn Đã Hủy : </strong>
                     <Link to="" className="count">
                       <span id="xans_myshop_orderstate_order_cancel_count">
-                        0
+                        {trashOrders.length}
                       </span>
                     </Link>
                   </li>
@@ -349,7 +158,7 @@ const AccountRes = () => {
                 <Link to="/order">
                   Đơn hàng
                   <span className="xans-element- xans-myshop xans-myshop-orderhistorytab">
-                    (<span id="xans_myshop_total_orders">0</span>)
+                    (<span id="xans_myshop_total_orders">{orders.length}</span>)
                   </span>
                 </Link>
               </li>
@@ -361,19 +170,13 @@ const AccountRes = () => {
                   Danh sách yêu thích
                   <span className="count">
                     (
-                    <span className="xans_myshop_main_interest_prd_cnt">0</span>
+                    <span className="xans_myshop_main_interest_prd_cnt">{productFavorites.length}</span>
                     )
                   </span>
                 </Link>
               </li>
               <li className="my_li4">
                 <Link to="/seen">Đã xem</Link>
-              </li>
-              <li className="my_li5">
-                <Link to="">Mã giảm giá</Link>
-              </li>
-              <li style={{ display: "none" }} className="my_li6">
-                <Link to="">Nhận xét của tôi</Link>
               </li>
               <li className="my_li7">
                 <Link to="/accountinfo">Thông tin tài khoản</Link>

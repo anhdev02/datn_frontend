@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 
 var emailBody = "";
@@ -9,7 +10,7 @@ const ForgotPasswordRes = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (email === "") {
-      toast.error("Vui lòng nhập email!");
+      toast.error("Vui lòng nhập email!", { position: "bottom-center" });
     } else {
       fetch(`http://localhost:8080/api/user/email/${email}`)
         .then((res) => res.json())
@@ -40,10 +41,10 @@ const ForgotPasswordRes = () => {
           fetch("http://localhost:8080/api/auth/send-email", requestOptions)
             .then((response) => response.text())
             .then((result) =>
-              toast.success("Đã gửi email!", { position: "top-right" })
+              toast.success("Đã gửi email!", { position: "bottom-center" })
             )
             .catch((error) =>
-              toast.error("Email chưa được gửi!", { position: "top-right" })
+              toast.error("Email chưa được gửi!", { position: "bottom-center" })
             );
 
           var url = "http://localhost:8080/api/user/verify/" + data.id;
@@ -71,39 +72,52 @@ const ForgotPasswordRes = () => {
   };
   return (
     <div id="contents">
-        <div id="titleArea" style={{marginTop: '20px', textAlign: 'center'}}>
-          <h3>Quên Mật Khẩu</h3>
-        </div>
-        <form id="findPasswdForm" name="findPasswdForm" action="/exec/front/Member/FindPasswd/" method="post" target="_self" encType="multipart/form-data">
-          <div className="xans-element- xans-member xans-member-findpasswd">
-            <div className="ec-base-table typeWrite">
-              <table border={1}>
-                <caption>
-                  Bước 1. Nhập Thông Tin Cá Nhân
-                </caption>
-                <colgroup>
-                  <col style={{width: '115px'}} />
-                  <col style={{width: 'auto'}} />
-                </colgroup>
-                <tbody>
-                  <tr id="email_view" className="email">
-                    <th scope="row">Địa Chỉ Email</th>
-                    <td>
-                      <input id="email" name="email" className="lostInput" placeholder defaultValue type="text" />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div id="emailMsg" className="emailMssage" />
-            <div className="ec-base-button gFull">
-              <a href="#none" className="btnSubmit">Gửi</a>
-            </div>
-          </div>
-        </form>
-        <ToastContainer />
+      <div id="titleArea" style={{ marginTop: "20px", textAlign: "center" }}>
+        <h3>Quên Mật Khẩu</h3>
       </div>
-  )
-}
+      <form
+        id="findPasswdForm"
+        name="findPasswdForm"
+        action="/exec/front/Member/FindPasswd/"
+        method="post"
+        target="_self"
+        encType="multipart/form-data"
+      >
+        <div className="xans-element- xans-member xans-member-findpasswd">
+          <div className="ec-base-table typeWrite">
+            <table border={1}>
+              <caption>Bước 1. Nhập Thông Tin Cá Nhân</caption>
+              <colgroup>
+                <col style={{ width: "115px" }} />
+                <col style={{ width: "auto" }} />
+              </colgroup>
+              <tbody>
+                <tr id="email_view" className="email">
+                  <th scope="row">Địa Chỉ Email</th>
+                  <td>
+                    <input
+                      id="email"
+                      name="email"
+                      className="lostInput"
+                      onChange={(e) => setEmail(e.target.value)}
+                      type="text"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="emailMsg" className="emailMssage" />
+          <div className="ec-base-button gFull">
+            <Link to="" onClick={handleSubmit} className="btnSubmit">
+              Gửi
+            </Link>
+          </div>
+        </div>
+      </form>
+      <ToastContainer />
+    </div>
+  );
+};
 
-export default ForgotPasswordRes
+export default ForgotPasswordRes;

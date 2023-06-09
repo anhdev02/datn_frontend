@@ -5,12 +5,10 @@ import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 
 const ListCategory = () => {
-  var url = "http://localhost:8080/api/category/list";
   const [allCat, setAllCat] = useState([]);
   const [category, setCategory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
-  const [isDeleted, setIsDeleted] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/category/all")
@@ -19,17 +17,18 @@ const ListCategory = () => {
       setAllCat(data);
     })
     .catch((err) => console.log(err));
+    loadData();
   }, []);
 
-  useEffect(() => {
-    fetch(url)
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/category/list')
     .then((res) => res.json())
     .then((data) => {
       setCategory(data);
-      setCurrentPage(1);
     })
     .catch((err) => console.log(err));
-  }, [isDeleted]);
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -76,11 +75,13 @@ const ListCategory = () => {
       };
 
       fetch(url, requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.log("error", error));
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
         toast.success("Đã xóa tạm thời danh mục!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
+        loadData();
+      })
+      .catch((error) => console.log("error", error));
     } 
   }
   return (

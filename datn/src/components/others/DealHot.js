@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { AddCart } from '../../store/action/cart';
 import {store} from '../../store/store'
+import axios from "axios";
 
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -14,19 +15,29 @@ const DealHot = () => {
   const [productsDealHot, setProductsDealHot] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [productFavorites, setProductFavorites] = useState([]);
+  const userId = localStorage.getItem("id");
   useEffect(() => {
     fetch("http://localhost:8080/api/product/dealhot/36")
       .then((res) => res.json())
       .then((data) => setProductsDealHot(data))
       .catch((err) => console.log(err));
+      fetchFavoriteProducts();
   }, []);
+
+  const productIds = productFavorites.map((favorite) => favorite.productId);
+
+  const updatedProducts = productsDealHot.map((product) => {
+    const icon_status = productIds.includes(product.id) ? "on" : "off";
+    return { ...product, icon_status };
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = productsDealHot.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = updatedProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(productsDealHot.length / itemsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(updatedProducts.length / itemsPerPage); i++) {
     pageNumbers.push(i);
   }
 
@@ -39,12 +50,73 @@ const DealHot = () => {
     const activeClass = number === currentPage ? "this" : "other";
     return (
       <li>
-        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+        <Link onClick={handleClick} id={number} to="" className={activeClass}>
           {number}
-        </a>
+        </Link>
       </li>
     );
   });
+
+  const fetchFavoriteProducts = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/favorite/user/${userId}`
+      );
+      setProductFavorites(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sản phẩm yêu thích:", error);
+    }
+  };
+
+  const handleImageClick = async (product) => {
+    if (product.icon_status === "on") {
+      removeFromFavorites(userId, product.id);
+    } else {
+      addToFavorites(userId, product.id);
+    }
+  };
+
+  const addToFavorites = async (userId, productId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/favorite/add",
+        {
+          userId: userId,
+          productId: productId,
+        }
+      );
+
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: 1,
+        }
+      );
+
+      const favoriteId = response.data.id;
+      fetchFavoriteProducts();
+      return favoriteId;
+    } catch (error) {
+      console.error("Lỗi khi thêm vào danh sách yêu thích:", error);
+    }
+  };
+
+  const removeFromFavorites = async (userId, productId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/favorite/${userId}/${productId}`
+      );
+      await axios.put(
+        `http://localhost:8080/api/product/favorite/${productId}`,
+        {
+          favoriteCount: -1,
+        }
+      );
+      fetchFavoriteProducts();
+    } catch (error) {
+      console.error("Lỗi khi xóa khỏi danh sách yêu thích:", error);
+    }
+  };
 
   function addToCartClickHandle(id, name, image, price, sale, quantity) {
     if(quantity===0) {
@@ -60,8 +132,8 @@ const DealHot = () => {
       <div id="container">
         <div id="contents">
           <div className="root_width">
-            <div className="xans-element- xans-product xans-product-menupackage">
-              <div className="xans-element- xans-product xans-product-headcategory path">
+            <div className=" xans-product xans-product-menupackage">
+              <div className=" xans-product xans-product-headcategory path">
                 <span>Trang Hiện Tại</span>
                 <ol>
                   <li>
@@ -72,7 +144,7 @@ const DealHot = () => {
                   </li>
                 </ol>
               </div>
-              <div className="xans-element- xans-product xans-product-headcategory title">
+              <div className=" xans-product xans-product-headcategory title">
                 <p className="banner">
                   <img src="assets/imgs/Deal hot_1140x282_0621.jpg" alt="" />
                 </p>
@@ -86,7 +158,7 @@ const DealHot = () => {
                 <article className="wrap-mProduct Product-list">
                   <div className="in-article">
                     <div className="root_width">
-                      <div className="xans-element- xans-product xans-product-listmain-21 xans-product-listmain xans-product-21 productList mProduct typeThumb">
+                      <div className=" xans-product xans-product-listmain-21 xans-product-listmain xans-product-21 productList mProduct typeThumb">
                         <ul className="prdList">
                           {currentItems.map((product) => (
                             <li>
@@ -127,7 +199,11 @@ const DealHot = () => {
                                           src="assets/imgs/btn_wish_before.png"
                                           className="icon_img ec-product-listwishicon"
                                           alt="Trước đăng ký Sản phẩm yêu thích"
-                                          icon_status="off"
+                                          style={{ cursor: "pointer" }}
+                                          icon_status={product.icon_status}
+                                          onClick={() =>
+                                            handleImageClick(product)
+                                          }
                                         />
                                       </span>
                                     </div>
@@ -146,8 +222,8 @@ const DealHot = () => {
                                       </span>
                                     </Link>
                                   </h4>
-                                  <ul className="xans-element- xans-product xans-product-listitem-21 xans-product-listitem xans-product-21 spec">
-                                    <li className="xans-record-">
+                                  <ul className=" xans-product xans-product-listitem-21 xans-product-listitem xans-product-21 spec">
+                                    <li className="">
                                       <span
                                         style={{
                                           fontSize: "12px",
@@ -164,7 +240,7 @@ const DealHot = () => {
                                         }}
                                       ></span>
                                     </li>
-                                    <li className="xans-record-">
+                                    <li className="">
                                       <span
                                         style={{
                                           fontSize: "12px",
@@ -206,51 +282,6 @@ const DealHot = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="#st">1</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <ul>
-            <li className="displaynone xans-record-">
-              <Link to="">
-                <img src="#" alt="" />
-                <span>##name##</span>
-              </Link>
-            </li>
-            <li className="displaynone xans-record-">
-              <Link to="">
-                <img src="#" alt="" />
-                <span>##name##</span>
-              </Link>
-            </li>
-          </ul>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
       </div>
       <ToastContainer/>
     </div>

@@ -139,6 +139,9 @@ html {
       }
     }
   }
+  .displaynone {
+    display: none !important;
+  }
   body {
     min-width: 280px;
     margin: 0;

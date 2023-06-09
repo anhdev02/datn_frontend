@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+
+
 const CreateProduct = () => {
   var urlCat = "http://localhost:8080/api/category/all";
   var urlBan = "http://localhost:8080/api/banner/all";
@@ -15,6 +17,7 @@ const CreateProduct = () => {
   const [bannerId, setBannerId] = useState(0);
   const [image, setImage] = useState();
   const [imageDetail, setImageDetail] = useState(null);
+  const [importPrice, setImportPrice] = useState();
   const [price, setPrice] = useState();
   const [sales, setSales] = useState();
   const [status, setStatus] = useState(true);
@@ -40,7 +43,6 @@ const CreateProduct = () => {
   const handleChange = (e, editor) => {
     const data = editor.getData();
     setDetail(data);
-    console.log(data);
   };
   const handleUploadfile = (e) => {
     const file = e.target.files[0];
@@ -111,6 +113,7 @@ const CreateProduct = () => {
       categoryId: catid === undefined ? category[0].id : catid,
       bannerId: bannerId,
       image: image,
+      importPrice: importPrice*1000,
       price: price*1000,
       sale: sales,
       status: status,
@@ -179,7 +182,28 @@ const CreateProduct = () => {
                     htmlFor="html5-text-input"
                     className="col-md-2 col-form-label"
                   >
-                    Giá
+                    Giá nhập
+                  </label>
+                  <div className="col-md-10">
+                    <div className="input-group input-group-merge">
+                      <span className="input-group-text">VNĐ</span>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={100}
+                        required
+                        onChange={(event) => setImportPrice(event.target.value)}
+                      />
+                      <span className="input-group-text">.000</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mb-3 row">
+                  <label
+                    htmlFor="html5-text-input"
+                    className="col-md-2 col-form-label"
+                  >
+                    Giá bán
                   </label>
                   <div className="col-md-10">
                     <div className="input-group input-group-merge">
@@ -200,7 +224,7 @@ const CreateProduct = () => {
                     htmlFor="html5-text-input"
                     className="col-md-2 col-form-label"
                   >
-                    Sales
+                    Giảm giá
                   </label>
                   <div className="col-md-10">
                     <div className="input-group input-group-merge">

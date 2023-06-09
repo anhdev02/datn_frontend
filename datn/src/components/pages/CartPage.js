@@ -8,15 +8,19 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderProductRes from '../common/HeaderProductRes'
 import CartRes from '../others/CartRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 
 const CartPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Giỏ hàng';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_order_basketpackage_8869'>
         <div id="container">
-            <HeaderProductRes/>
+            <HeaderProductRes title="Giỏ hàng"/>
             <CartRes/>
             <FooterRes/>
         </div>

@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect,  useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -6,21 +5,21 @@ import { confirm } from "react-confirm-box";
 
 
 const ListUser = () => {
-  var url = "http://localhost:8080/api/user/list";
   const [user, setUser] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   useEffect(() => {
-    axios
-      .get(url)
-      .then((res) => {
-        setUser(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [isDeleted]);
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/user/list')
+    .then((res) => res.json())
+    .then((data) => {
+      setUser(data);
+    })
+    .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -68,10 +67,12 @@ const ListUser = () => {
   
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+          console.log(result);
+          toast.success("Đã xóa tạm thời người dùng!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-        toast.success("Đã xóa tạm thời người dùng!", { position: "top-right" });
-        setIsDeleted(!isDeleted);
     }
    
   }

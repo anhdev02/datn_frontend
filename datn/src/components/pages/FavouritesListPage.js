@@ -10,14 +10,18 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderProductRes from '../common/HeaderProductRes'
 import FavouritesListRes from '../others/FavouritesListRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 const FavouritesListPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Danh sách yêu thích';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_myshop_wishlist_8655'>
         <div id="container">
-            <HeaderProductRes/>
+            <HeaderProductRes title="Danh sách yêu thích"/>
             <FavouritesListRes/>
             <FooterRes/>
         </div>

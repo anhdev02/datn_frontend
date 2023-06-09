@@ -8,18 +8,22 @@ import ResetPassword from '../others/ResetPassword';
 import ResetPasswordRes from '../others/ResetPasswordRes';
 import { useLocation, useParams } from 'react-router-dom';
 import queryString from 'query-string';
+import { useEffect } from 'react';
 
 const ResetPasswordPage = () => {
   const{id}=useParams();
   const{search}=useLocation();
   const{userId}=queryString.parse(search);
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Đặt lại mật khẩu';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_member_findpasswd_11353'>
         <div id="container">
             <HeaderRes/>
-            <ResetPasswordRes/>
+            <ResetPasswordRes id={id} userId={userId}/>
             <FooterRes/>
         </div>
     </div>

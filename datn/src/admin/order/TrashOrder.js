@@ -1,24 +1,24 @@
-import axios from 'axios';
 import React, { useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import { confirm } from "react-confirm-box";
 
 const TrashOrder = () => {
-  var url = "http://localhost:8080/api/order/trash"
   const [order, setOrder] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(4);
   useEffect(()=>{
-    axios.get(url)
-    .then(res=>{
-      setOrder(res.data)
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/order/trash')
+    .then((res) => res.json())
+    .then((data) => {
+      setOrder(data);
     })
-    .catch(err=>{
-      console.log(err)
-    })
-  }, [isDeleted]);
+    .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -64,10 +64,12 @@ const TrashOrder = () => {
 
     fetch(url, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
+      .then((result) => {
+        console.log(result);
+        toast.success("Đơn hàng đã được khôi phục!", { position: "top-right" });
+        loadData();
+      })
       .catch((error) => console.log("error", error));
-      toast.success("Đơn hàng đã được khôi phục!", { position: "top-right" });
-      setIsDeleted(!isDeleted);
   }
   const Delete = async (event) => {
     event.preventDefault();
@@ -93,9 +95,11 @@ const TrashOrder = () => {
             })
           }
         })
-        .then(result => console.log(result))
+        .then(result => {
+          console.log(result);
+          loadData();
+        })
         .catch(error => console.log('error', error));
-        setIsDeleted(!isDeleted);
     }
     
   }

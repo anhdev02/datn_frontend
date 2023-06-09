@@ -11079,6 +11079,9 @@
   }
   #orderFixItem.ec-base-button.gFull {
     margin: 0;
+    #zoid-paypal-buttons-uid_d38e6a308e_mtm6mdi6nte {
+      display: none !important;
+    }
     [class*="btn"] {
       font-size: 18px;
       font-weight: 400;
@@ -15619,7 +15622,6 @@
   }
   .AllCategoryList {
     border-top: 1px solid #eee;
-    display: none;
     position: relative;
     -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
@@ -20623,7 +20625,7 @@
               background-image: url("../imgs/cod.gif");
             }
             input[type="radio"]#addr_paymethod1 {
-              background-image: url("../imgs/visa.gif");
+              background-image: url("../imgs/paypal.jpg");
             }
             input[type="radio"]#addr_paymethod2 {
               background-image: url("../imgs/momo.gif");

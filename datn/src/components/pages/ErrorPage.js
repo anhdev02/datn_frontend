@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../assets/scss/Error.scss";
+import { useEffect } from "react";
 const ErrorPage = () => {
+  useEffect(() => {
+    document.title = 'Lỗi không tìm thấy';
+  }, [])
   return (
     <div className="error__page">
       <h1>Chức năng đang được phát triển</h1>

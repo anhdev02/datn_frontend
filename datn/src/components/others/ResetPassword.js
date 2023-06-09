@@ -8,7 +8,6 @@ const ResetPassword = (props) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [user, setUser] = useState({});
   useEffect(() => {
     fetch(`http://localhost:8080/api/user/${props.userId}`)
       .then((res) => res.json())
@@ -16,7 +15,6 @@ const ResetPassword = (props) => {
         if (data.verify !== props.id) {
           navigate("/error");
         }
-        setUser(data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -24,13 +22,13 @@ const ResetPassword = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password === "") {
-      toast.error("Vui lòng nhập mật khẩu!", { position: "top-right" });
+      toast.error("Vui lòng nhập mật khẩu!", { position: "bottom-left" });
     } else if (passwordConfirm === "") {
       toast.error("Vui lòng nhập ô nhập lại mật khẩu!", {
-        position: "top-right",
+        position: "bottom-left",
       });
     } else if (password !== passwordConfirm) {
-      toast.error("Mật khẩu không khớp!", { position: "top-right" });
+      toast.error("Mật khẩu không khớp!", { position: "bottom-left" });
     } else {
       var url = "http://localhost:8080/api/user/password/" + props.userId;
       var myHeaders = new Headers();
@@ -50,11 +48,11 @@ const ResetPassword = (props) => {
         .then((response) => response.text())
         .then((result) => console.log(result))
         .catch((error) => console.log("error", error));
-        toast.success("Cài lại mật khẩu thành công!", { position: "top-right" });
+        toast.success("Cài lại mật khẩu thành công!", { position: "bottom-left" });
         setTimeout(() => navigate("/login"), 1000);
     }
   };
-  if (props.userId === undefined) return <Navigate to="/error" />;
+  if (props.userId === '') return <Navigate to="/error" />;
   return (
     <div id="wrap">
       <div id="container">
@@ -113,7 +111,7 @@ const ResetPassword = (props) => {
                     <div id="emailMsg" className="emailMssage" />
                     <div className="ec-base-button gColumn">
                       <Link
-                        to="#st"
+                        to=""
                         onClick={handleSubmit}
                         className="btnSubmit sizeL"
                       >
@@ -127,37 +125,6 @@ const ResetPassword = (props) => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="/order/basket.html">0</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <a href="#header" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </a>
-        </p>
       </div>
       <ToastContainer />
     </div>

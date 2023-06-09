@@ -1,18 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Stores = () => {
+  const [activeTab, setActiveTab] = useState("mien_bac");
+
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+  };
   return (
     <div id="wrap">
       <div id="container">
         <div id="contents">
           <div className="root_width">
-            <style
-              dangerouslySetInnerHTML={{
-                __html:
-                  '\n              .store_img {\n                background: url("assets/imgs/title_image.jpg") no-repeat 0 50%;\n                background-size: auto 100%;\n                height: 270px;\n                margin-left: 20px;\n                color: #fff;\n                font-size: 16px;\n                font-weight: 500;\n                display: flex;\n                align-items: center;\n                padding-left: 100px;\n              }\n              .store_img h3 {\n                font-size: 30px;\n                font-weight: 900;\n                margin-bottom: 20px;\n              }\n            ',
-              }}
-            />
             <div className="path">
               <span>Trang Hiện Tại</span>
               <ol>
@@ -48,24 +47,40 @@ const Stores = () => {
             </div>
             <div className="store_container">
               <div className="store_width">
-                <div className="store_img">
-                  <div className="text-store">
-                    <h3>Hệ thống cửa hàng</h3>
-                    <span>
-                      Hãy tìm cửa hàng
-                      <br />
-                      Lock&amp;Lock gần nhất với bạn.
-                    </span>
-                  </div>
-                </div>
                 <div className="store_width_tab">
                   <h3 className="store_h3">Tìm cửa hàng</h3>
                   <div className="store_tab">
-                    <button className="store_tablinks">Miền Bắc</button>
-                    <button className="store_tablinks">Miền Trung</button>
-                    <button className="store_tablinks active">Miền Nam</button>
+                    <button
+                      className={`store_tablinks ${
+                        activeTab === "mien_bac" ? "active" : ""
+                      }`}
+                      onClick={() => handleTabClick("mien_bac")}
+                    >
+                      Miền Bắc
+                    </button>
+                    <button
+                      className={`store_tablinks ${
+                        activeTab === "mien_trung" ? "active" : ""
+                      }`}
+                      onClick={() => handleTabClick("mien_trung")}
+                    >
+                      Miền Trung
+                    </button>
+                    <button
+                      className={`store_tablinks ${
+                        activeTab === "mien_nam" ? "active" : ""
+                      }`}
+                      onClick={() => handleTabClick("mien_nam")}
+                    >
+                      Miền Nam
+                    </button>
                   </div>
-                  <div id="mien_bac" className="store_tabcontent">
+                  <div
+                    id="mien_bac"
+                    className={`store_tabcontent ${
+                      activeTab !== "mien_bac" ? "displaynone" : ""
+                    }`}
+                  >
                     <div>
                       <table className="store_table">
                         <tbody>
@@ -77,7 +92,7 @@ const Stores = () => {
                           </tr>
                           <tr>
                             <td>
-                              <a href="/stores/mega.html">Aeon mall Ha Dong</a>
+                              <Link to="">Aeon mall Ha Dong</Link>
                             </td>
                             <td>
                               Tầng 3, Aeon mall Hà Đông, Phường Dương Nội, Quận
@@ -247,7 +262,12 @@ const Stores = () => {
                       </table>
                     </div>
                   </div>
-                  <div id="mien_trung" className="store_tabcontent">
+                  <div
+                    id="mien_trung"
+                    className={`store_tabcontent ${
+                      activeTab !== "mien_trung" ? "displaynone" : ""
+                    }`}
+                  >
                     <div>
                       <table className="store_table">
                         <tbody>
@@ -259,7 +279,7 @@ const Stores = () => {
                           </tr>
                           <tr>
                             <td>
-                              <a href="/stores/mega.html">F2C Huế</a>
+                              <Link to="">F2C Huế</Link>
                             </td>
                             <td>
                               Số 50A, Đường hùng Vương, Phường Phú Nhuận, Thành
@@ -301,8 +321,9 @@ const Stores = () => {
                   </div>
                   <div
                     id="mien_nam"
-                    className="store_tabcontent"
-                    style={{ display: "block" }}
+                    className={`store_tabcontent ${
+                      activeTab !== "mien_nam" ? "displaynone" : ""
+                    }`}
                   >
                     <div>
                       <table className="store_table">
@@ -315,7 +336,7 @@ const Stores = () => {
                           </tr>
                           <tr>
                             <td>
-                              <a href="/stores/mega.html">Aeon Bình Tân</a>
+                              <Link to="">Aeon Bình Tân</Link>
                             </td>
                             <td>
                               01 đường số 17A, khu phố 11, phường Bình Trị Đông
@@ -513,51 +534,6 @@ const Stores = () => {
           </div>
         </div>
         <hr className="layout" />
-      </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="/order/basket.html">0</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <ul>
-            <li className="displaynone xans-record-">
-              <a href="/product/detail.html##param##">
-                <img src="about:blank" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-            <li className="displaynone xans-record-">
-              <a href="/product/detail.html##param##">
-                <img src="about:blank" alt="" />
-                <span>##name##</span>
-              </a>
-            </li>
-          </ul>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
       </div>
     </div>
   );

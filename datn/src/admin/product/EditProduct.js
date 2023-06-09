@@ -15,6 +15,7 @@ const EditProduct = () => {
   const [category, setCategory] = useState();
   const [banner, setBanner] = useState([]);
   const [prdName, setPrdName] = useState();
+  const [importPrice, setImportPrice] = useState();
   const [price, setPrice] = useState();
   const [sales, setSales] = useState();
   const [cat, setCat] = useState();
@@ -163,6 +164,7 @@ const EditProduct = () => {
       categoryId: cat!==undefined ? cat: product.categoryId,
       bannerId: bannerId!==undefined ? bannerId : product.bannerId,
       image: image!==undefined ? image: product.image,
+      importPrice: importPrice!==undefined ? importPrice*1000: product.importPrice,
       price: price!==undefined ? price*1000: product.price,
       sale: sales!==undefined ? sales: product.sale,
       status: status!==undefined ? status: product.status,
@@ -225,7 +227,28 @@ const EditProduct = () => {
                     htmlFor="html5-text-input"
                     className="col-md-2 col-form-label"
                   >
-                    Giá
+                    Giá nhập
+                  </label>
+                  <div className="col-md-10">
+                    <div className="input-group input-group-merge">
+                      <span className="input-group-text">VNĐ</span>
+                      <input
+                        type="text"
+                        className="form-control"
+                        defaultValue={product ? product.importPrice/1000 : ""}
+                        placeholder={100}
+                        onChange={(event) => setImportPrice(event.target.value)}
+                      />
+                      <span className="input-group-text">.000</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mb-3 row">
+                  <label
+                    htmlFor="html5-text-input"
+                    className="col-md-2 col-form-label"
+                  >
+                    Giá bán
                   </label>
                   <div className="col-md-10">
                     <div className="input-group input-group-merge">
@@ -263,7 +286,7 @@ const EditProduct = () => {
                     htmlFor="html5-text-input"
                     className="col-md-2 col-form-label"
                   >
-                    Sale
+                    Giảm giá
                   </label>
                   <div className="col-md-10">
                     <div className="input-group input-group-merge">

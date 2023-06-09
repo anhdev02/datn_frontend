@@ -8,14 +8,18 @@ import HeaderBlogRes from '../common/HeaderBlogRes'
 import { useMediaQuery } from 'react-responsive'
 import StoryRes from '../others/StoryRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 const StoryPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Story';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_8094'>
         <div id="container">
-            <HeaderBlogRes/>
+            <HeaderBlogRes title="Story"/>
             <StoryRes/>
             <FooterRes/>
         </div>

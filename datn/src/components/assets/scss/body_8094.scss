@@ -296,19 +296,19 @@
                     }
                 }
             }
-            >li#cate24 {
+            >li#cate1 {
                 background-image: url(../imgs/aside_li1.png);
             }
-            >li#cate25 {
+            >li#cate2 {
                 background-image: url(../imgs/aside_li2.png);
             }
-            >li#cate26 {
+            >li#cate3 {
                 background-image: url(../imgs/aside_li3.png);
             }
-            >li#cate23 {
+            >li#cate4 {
                 background-image: url(../imgs/aside_li4.png);
             }
-            >li#cate27 {
+            >li#cate5 {
                 background-image: url(../imgs/aside_li5.png);
             }
             >li.selected {
@@ -899,7 +899,7 @@
         }
         >ul {
             >li {
-                padding: 0 20px;
+                padding: 0 15px;
                 >a {
                     line-height: 20px;
                     padding: 10px 0;
@@ -1111,7 +1111,6 @@
                 display: inline-block;
                 padding: 0 25px;
                 line-height: 55px;
-                background: url("../imgs/gate-d.png") no-repeat right 55%;
                 background-size: 20px;
             }
             a.off-headcategory {
@@ -1120,19 +1119,16 @@
         }
         .sub-header {
             .category {
-                left: 40px;
+                left: 15px;
                 width: 30px;
             }
         }
         .searchWrap {
-            position: absolute;
-            top: 85px;
+            position: relative;
+            top: -5px;
             left: 0;
             width: 100%;
-            height: 120px;
-            padding: 40px 30px;
-            visibility: hidden;
-            opacity: 0;
+            height: 50px;
             transform: translateY(30%);
             transition: all 0.3s ease;
             z-index: -1;
@@ -1450,7 +1446,7 @@
         .xans-product-menupackage.swiper-container0 {
             >ul {
                 >li {
-                    padding: 0 20px;
+                    padding: 0 15px;
                     height: 40px;
                 }
             }

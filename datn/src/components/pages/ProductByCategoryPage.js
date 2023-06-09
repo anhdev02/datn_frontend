@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Footer from '../common/Footer'
 import Header from '../common/Header'
 import { useMediaQuery } from 'react-responsive'
@@ -15,14 +15,16 @@ const ProductByCategoryPage = () => {
   const{id}=useParams();
   const{search}=useLocation();
   const{name}=queryString.parse(search);
-  
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Sản phẩm theo danh mục';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_7866'>
         <div id="container">
             <HeaderRes/>
-            <ProductByCategoryRes/>
+            <ProductByCategoryRes id={id}/>
             <FooterRes/>
         </div>
     </div>

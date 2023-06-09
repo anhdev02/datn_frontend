@@ -1,11 +1,11 @@
 import React from "react";
 import { useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 const AddImage = () => {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [image01, setImage01] = useState();
   const [imgSrc01, setImgSrc01] = useState("");
   const [image02, setImage02] = useState();
@@ -124,7 +124,7 @@ const AddImage = () => {
         console.log(response.text())
         if(response.ok){
           toast.success("Thêm hình ảnh thành công!", { position: "top-right" });
-          setTimeout(() =>Navigate("/dashboard/product/list"),1000);
+          setTimeout(() =>navigate("/dashboard/product/list"),1000);
         }
         else
          toast.error("Thêm hình ảnh không thành công!", { position: "top-right" });

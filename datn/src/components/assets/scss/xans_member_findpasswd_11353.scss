@@ -3058,7 +3058,7 @@
         }
         tbody {
             th {
-                padding: 12px 0 12px 13px;
+                padding: 12px 0 12px 10px;
                 text-align: left;
             }
         }
@@ -5765,6 +5765,7 @@
         }
     }
     input[type=text] {
+        width: 100%;
         padding: 10px;
         font-size: 13px;
         line-height: 13px;

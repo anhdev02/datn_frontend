@@ -10,14 +10,18 @@ import '../assets/scss/xans_myshop_addrlist_8631.scss'
 import AddressBookRes from '../others/AddressBookRes'
 import HeaderInfoRes from '../common/HeaderInfoRes'
 import FooterRes from '../common/FooterRes'
+import { useEffect } from 'react'
 
 const AddressBookPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Sổ địa chỉ';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_myshop_addrlist_8631'>
         <div id="container">
-            <HeaderInfoRes/>
+            <HeaderInfoRes title="Sổ địa chỉ"/>
             <AddressBookRes/>
             <FooterRes/>
         </div>

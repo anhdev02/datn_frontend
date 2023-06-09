@@ -17,7 +17,7 @@ const Search = (props) => {
   const location = useLocation();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [productFavorites, setProductFavorites] = useState([]);
   const userId = localStorage.getItem("id");
   useEffect(() => {
@@ -207,17 +207,6 @@ const Search = (props) => {
                   id="searchContent"
                   className="xans-product xans-product-searchdata"
                 >
-                  <form
-                    className="searchCondition"
-                    id="ec-product-searchdata-form"
-                    method="get"
-                  >
-                    <input
-                      type="hidden"
-                      name="keyword"
-                      id="ec-product-searchdata-keyword_hidden"
-                    />
-                  </form>
                 </div>
                 <div className="searchResult">
                   <p className="record">

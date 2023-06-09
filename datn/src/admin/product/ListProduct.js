@@ -1,25 +1,25 @@
-import axios from "axios";
 import React, { useEffect,  useState } from "react";
 import { Link } from "react-router-dom";
 import { confirm } from "react-confirm-box";
 import { ToastContainer, toast } from "react-toastify";
 
 const ListProduct = () => {
-  var url = "http://localhost:8080/api/product/list";
   const [product, setProduct] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+
   useEffect(() => {
-    axios
-      .get(url)
-      .then((res) => {
-        setProduct(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [isDeleted]);
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    fetch('http://localhost:8080/api/product/list')
+    .then((res) => res.json())
+    .then((data) => {
+      setProduct(data);
+    })
+    .catch((err) => console.log(err));
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -67,10 +67,12 @@ const ListProduct = () => {
 
       fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+          console.log(result);
+          toast.success("Đã xóa tạm thời sản phẩm!", { position: "top-right" });
+          loadData();
+        })
         .catch((error) => console.log("error", error));
-      toast.success("Đã xóa tạm thời sản phẩm!", { position: "top-right" });
-      setIsDeleted(!isDeleted);
     }
   };
   return (
@@ -90,7 +92,7 @@ const ListProduct = () => {
                 <th>Tên sản phẩm</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
-                <th>Sales</th>
+                <th>Giảm giá</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>

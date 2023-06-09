@@ -27,26 +27,28 @@ const Register = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      }).then((data)=> {
-        if (data.status) {
-          toast.success("Đăng ký thành công!", { position: "bottom-left" });
-          setTimeout(() => setLoggedIn({ loggedIn: data.status }), 2000);
-        } else {
-          toast.error(data.message, { position: "bottom-left" });
-        }
       })
-      .catch((error) => {
-        console.error("There was a problem with the network request:", error);
-        toast.error("Có lỗi xảy ra khi tạo người dùng!", {
-          position: "bottom-left",
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Network response was not ok.");
+          }
+        })
+        .then((data) => {
+          if (data.status) {
+            toast.success("Đăng ký thành công!", { position: "bottom-left" });
+            setTimeout(() => setLoggedIn({ loggedIn: data.status }), 2000);
+          } else {
+            toast.error(data.message, { position: "bottom-left" });
+          }
+        })
+        .catch((error) => {
+          console.error("There was a problem with the network request:", error);
+          toast.error("Có lỗi xảy ra khi tạo người dùng!", {
+            position: "bottom-left",
+          });
         });
-      });
     }
   }
 
@@ -85,6 +87,70 @@ const Register = () => {
                       <col style={{ width: "auto" }} />
                     </colgroup>
                     <tbody>
+                      <tr>
+                        <th scope="row">
+                          Tên
+                          <img
+                            src="assets/imgs/ico_required_blue.gif"
+                            alt="Required Field"
+                          />
+                        </th>
+                        <td>
+                          <input
+                            id="name"
+                            name="name"
+                            className="ec-member-name"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            maxLength={30}
+                            required
+                            type="text"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th scope="row">
+                          Email
+                          <img
+                            src="assets/imgs/ico_required_blue.gif"
+                            alt="Required Field"
+                          />
+                        </th>
+                        <td>
+                          <input
+                            id="email1"
+                            name="email1"
+                            value={email}
+                            required
+                            onChange={(e) => setEmail(e.target.value)}
+                            type="email"
+                          />
+                          <span id="emailMsg" />
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">
+                          Điện Thoại
+                          <img
+                            src="assets/imgs/ico_required_blue.gif"
+                            alt="Required Field"
+                          />
+                        </th>
+                        <td className="phone-td">
+                          <input
+                            id="phone2"
+                            name="phone"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            maxLength={15}
+                            type="text"
+                            placeholder="Nhập 9 chữ số"
+                            required
+                            pattern="[0-9]{9}"
+                          />
+                        </td>
+                      </tr>
                       <tr>
                         <th scope="row">
                           Mật Khẩu
@@ -156,70 +222,6 @@ const Register = () => {
                             type="password"
                           />
                           <span id="pwConfirmMsg" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th scope="row">
-                          Email
-                          <img
-                            src="assets/imgs/ico_required_blue.gif"
-                            alt="Required Field"
-                          />
-                        </th>
-                        <td>
-                          <input
-                            id="email1"
-                            name="email1"
-                            value={email}
-                            required
-                            onChange={(e) => setEmail(e.target.value)}
-                            type="email"
-                          />
-                          <span id="emailMsg" />
-                        </td>
-                      </tr>
-                      <tr >
-                        <th scope="row">
-                          Tên
-                          <img
-                            src="assets/imgs/ico_required_blue.gif"
-                            alt="Required Field"
-                          />
-                        </th>
-                        <td>
-                          <input
-                            id="name"
-                            name="name"
-                            className="ec-member-name"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            maxLength={30}
-                            required
-                            type="text"
-                          />
-                        </td>
-                      </tr>
-                      <tr className>
-                        <th scope="row">
-                          Điện Thoại
-                          <img
-                            src="assets/imgs/ico_required_blue.gif"
-                            className
-                            alt="Required Field"
-                          />
-                        </th>
-                        <td className="phone-td">
-                          <input
-                            id="phone2"
-                            name="phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            maxLength={15}
-                            type="text"
-                            placeholder="Nhập 9 chữ số"
-                            required
-                            pattern="[0-9]{9}"
-                          />
                         </td>
                       </tr>
                     </tbody>

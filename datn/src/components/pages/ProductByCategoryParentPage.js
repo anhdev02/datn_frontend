@@ -11,18 +11,23 @@ import FooterRes from '../common/FooterRes'
 import ProductByCategoryParent from '../others/ProductByCategoryParent'
 import { useLocation, useParams } from 'react-router-dom'
 import queryString from 'query-string'
+import ProductByCategoryParentRes from '../others/ProductByCategoryParentRes'
+import { useEffect } from 'react'
 
 const ProductByCategoryParentPage = () => {
   const{id}=useParams();
   const{search}=useLocation();
   const{name}=queryString.parse(search);
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Sản phẩm theo danh mục';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 body_7866'>
         <div id="container">
             <HeaderRes/>
-            <ProductByCategoryRes/>
+            <ProductByCategoryParentRes id={id}/>
             <FooterRes/>
         </div>
     </div>

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import { ToastContainer, toast } from "react-toastify";
+import { AddCart } from "../../store/action/cart";
+import { store } from "../../store/store";
 
 const formatter = new Intl.NumberFormat("vi-VN", {
   style: "currency",
@@ -10,13 +12,37 @@ const formatter = new Intl.NumberFormat("vi-VN", {
 });
 
 const Seen = () => {
+  const userId = localStorage.getItem("id");
+  const user = localStorage.getItem("username");
+  const [orders, setOrders] = useState([]);
+  const [productFavorites, setProductFavorites] = useState([]);
   const [viewedProducts, setViewedProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8);
-  useEffect(() => {
-    const viewedProductsData = JSON.parse(localStorage.getItem('viewedProducts')) || [];
+
+  const loadData = () => {
+    const viewedProductsData =
+      JSON.parse(localStorage.getItem("viewedProducts")) || [];
     setViewedProducts(viewedProductsData);
+  };
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/order/user/${user}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(data);
+      })
+      .catch((err) => console.log(err));
+
+    fetch(`http://localhost:8080/api/product/favorite/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setProductFavorites(data))
+      .catch((err) => console.log(err));
+
+    loadData();
   }, []);
+
+
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -36,12 +62,39 @@ const Seen = () => {
     const activeClass = number === currentPage ? "this" : "other";
     return (
       <li>
-        <a onClick={handleClick} id={number} href="#st" className={activeClass}>
+        <Link onClick={handleClick} id={number} to="" className={activeClass}>
           {number}
-        </a>
+        </Link>
       </li>
     );
   });
+
+  const removeFromViewedProducts = (productId) => {
+    const viewedProducts = JSON.parse(localStorage.getItem('viewedProducts')) || [];
+    const updatedViewedProducts = viewedProducts.filter((product) => product.id !== productId);
+    localStorage.setItem('viewedProducts', JSON.stringify(updatedViewedProducts));
+    loadData();
+  };
+
+  function addToCartClickHandle(id, name, image, price, sale, quantity) {
+    if (quantity === 0) {
+      toast.error("Đã hết sản phẩm", { position: "bottom-left" });
+    } else {
+      store.dispatch(
+        AddCart({
+          id: id,
+          name: name,
+          quantity: 1,
+          price: price,
+          sale: sale,
+          image: image,
+        })
+      );
+      toast.success("Đã thêm sản phẩm vào giỏ hàng", {
+        position: "bottom-left",
+      });
+    }
+  }
 
   return (
     <div id="wrap">
@@ -72,7 +125,11 @@ const Seen = () => {
                       <Link to="/order">
                         Đơn hàng
                         <span className="xans-element- xans-myshop xans-myshop-orderhistorytab">
-                          (<span id="xans_myshop_total_orders">0</span>)
+                          (
+                          <span id="xans_myshop_total_orders">
+                            {orders.length}
+                          </span>
+                          )
                         </span>
                       </Link>
                     </li>
@@ -85,7 +142,7 @@ const Seen = () => {
                         <span className="count">
                           (
                           <span className="xans_myshop_main_interest_prd_cnt">
-                            0
+                            {productFavorites.length}
                           </span>
                           )
                         </span>
@@ -93,9 +150,6 @@ const Seen = () => {
                     </li>
                     <li className="my_li4">
                       <Link to="/seen">Đã xem</Link>
-                    </li>
-                    <li style={{ display: "none" }} className="my_li6">
-                      <Link to="">Nhận xét của tôi</Link>
                     </li>
                     <li className="my_li7">
                       <Link to="/accountinfo">Thông tin tài khoản</Link>
@@ -109,92 +163,94 @@ const Seen = () => {
                 </div>
                 <div className="xans-element- xans-product xans-product-recentlist ec-base-table typeList Product-list xans-record-">
                   <ul className="xans-element- xans-product xans-product-listitem prdList recent_List">
-                    {
-                      currentItems.map((product) => (
-                        <li>
-                          <div className="inner">
-                            <div className="thumbnail">
-                              <div className="prdImg">
-                                <div className="wrap-thumbnail">
-                                  <Link className="BG-thumbnail" to={`/productdetail/${product.id}`}>
-                                    <img
-                                      src={`http://localhost:3000/assets/imgs/${product.image}`}
-                                      alt=""
-                                    />
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="description">
-                              <h4 className="name">
-                                <Link to={`/productdetail/${product.id}`}>
-                                  {product.productName}
+                    {currentItems.map((product) => (
+                      <li>
+                        <div className="inner">
+                          <div className="thumbnail">
+                            <div className="prdImg">
+                              <div className="wrap-thumbnail">
+                                <Link
+                                  className="BG-thumbnail"
+                                  to={`/productdetail/${product.id}`}
+                                >
+                                  <img
+                                    src={`http://localhost:3000/assets/imgs/${product.image}`}
+                                    alt=""
+                                  />
                                 </Link>
-                              </h4>
-                              <p className="strike price1">
-                                <strong className="txtEm">{formatter.format(product.price)}</strong>
-                              </p>
-                              <p className="txtEm">
-                                <strong>{formatter.format(
-                                    product.price -
-                                      product.price * (0.01 * product.sale)
-                                  )}</strong>
-                              </p>
-                              <div className="wrap-new-icon">
-                                <span className="wrap-new-span"> </span>
                               </div>
+                              <Link
+                                to=""
+                                onClick={() =>
+                                  addToCartClickHandle(
+                                    product.id,
+                                    product.productName,
+                                    product.image,
+                                    product.price,
+                                    product.sale,
+                                    product.quantity
+                                  )
+                                }
+                                class="btnSubmit  wish-thum-left"
+                              >
+                                Mua
+                              </Link>
+                              <Link
+                                to=""
+                                onClick={() => removeFromViewedProducts(product.id)}
+                                class="btnNormal wish-thum-right btn_recent_del"
+                              >
+                                Xóa
+                              </Link>
                             </div>
                           </div>
-                        </li>
-                      ))
-                    }
+                          <div className="description">
+                            <h4 className="name">
+                              <Link to={`/productdetail/${product.id}`}>
+                                {product.productName}
+                              </Link>
+                            </h4>
+                            <p className="strike price1">
+                              <strong className="txtEm">
+                                {formatter.format(product.price)}
+                              </strong>
+                            </p>
+                            <p className="txtEm">
+                              <strong>
+                                {formatter.format(
+                                  product.price -
+                                    product.price * (0.01 * product.sale)
+                                )}
+                              </strong>
+                            </p>
+                            <div className="wrap-new-icon">
+                              <span className="wrap-new-span"> </span>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
                   </ul>
-                  <p className="message displaynone">
+                  <p
+                    className={
+                      viewedProducts.length !== 0
+                        ? "message displaynone"
+                        : "message"
+                    }
+                  >
                     Bạn không có sản phẩm nào được xem gần đây.
                   </p>
                 </div>
                 <div className="xans-product xans-product-normalpaging ec-base-paginate">
-                <ol>
-                  {renderPageNumbers}
-                </ol>
-              </div>
+                  <ol>{renderPageNumbers}</ol>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <hr className="layout" />
       </div>
-      <hr className="layout" />
-      <div id="quick">
-        <div className="xans-element- xans-layout xans-layout-orderbasketcount">
-          <strong>Giỏ Hàng</strong>
-          <span>
-            <a href="#st">0</a> Sản Phẩm
-          </span>
-        </div>
-        <div className="xans-element- xans-layout xans-layout-productrecent">
-          <h2>
-            <Link to="/seen">Đã Xem Gần Đây</Link>
-          </h2>
-          <p className="player">
-            <img
-              src="assets/imgs/btn_recent_prev.gif"
-              alt="Prev"
-              className="prev"
-            />
-            <img
-              src="assets/imgs/btn_recent_next.gif"
-              alt="Next"
-              className="next"
-            />
-          </p>
-        </div>
-        <p className="pageTop">
-          <Link to="" title="Back to Top">
-            <img src="assets/imgs/btn_top1.gif" alt="Top" />
-          </Link>
-        </p>
-      </div>
+      <ToastContainer />
     </div>
   );
 };

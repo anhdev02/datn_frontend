@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AdminHelmet from "./AdminHelmet";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
@@ -27,50 +27,91 @@ import EditBanner from "../banner/EditBanner";
 import ListBanner from "../banner/ListBanner";
 import TrashBanner from "../banner/TrashBanner";
 import AddImage from "../product/AddImage";
+import CreateRecipe from "../recipe/CreateRecipe";
+import EditRecipe from "../recipe/EditRecipe";
+import ListRecipe from "../recipe/ListRecipe";
+import TrashRecipe from "../recipe/TrashRecipe";
+import CreateTV from "../tv/CreateTV";
+import EditTV from "../tv/EditTV";
+import ListTV from "../tv/ListTV";
+import TrashTV from "../tv/TrashTV";
+import CreateGuide from "../guide/CreateGuide";
+import EditGuide from "../guide/EditGuide";
+import ListGuide from "../guide/ListGuide";
+import TrashGuide from "../guide/TrashGuide";
 
 const AdminTemplate = () => {
+  const [openMenu, setOpenMenu] = useState(false);
   const [openCategory, setopenCategory] = React.useState(false);
   const [openProduct, setopenProduct] = React.useState(false);
   const [openOrder, setopenOrder] = React.useState(false);
   const [openUser, setopenUser] = React.useState(false);
   const [openSlide, setopenSlide] = React.useState(false);
   const [openBanner, setopenBanner] = React.useState(false);
-  const [openBlog, setopenBlog] = React.useState(false);
+  const [openRecipe, setopenRecipe] = React.useState(false);
+  const [openTV, setopenTV] = React.useState(false);
+  const [openGuide, setopenGuide] = React.useState(false);
   const [openContact, setopenContact] = React.useState(false);
-  const OpenCategory = () => {
+
+  const OpenMenu = (e) => {
+    e.preventDefault();
+    setOpenMenu(!openMenu);
+  };
+
+  const OpenCategory = (e) => {
+    e.preventDefault();
     setopenCategory(!openCategory);
   };
-  const OpenProduct = () => {
+  const OpenProduct = (e) => {
+    e.preventDefault();
     setopenProduct(!openProduct);
   };
-  const OpenOrder = () => {
+  const OpenOrder = (e) => {
+    e.preventDefault();
     setopenOrder(!openOrder);
   };
-  const OpenUser = () => {
+  const OpenUser = (e) => {
+    e.preventDefault();
     setopenUser(!openUser);
   };
-  const OpenSlide = () => {
+  const OpenSlide = (e) => {
+    e.preventDefault();
     setopenSlide(!openSlide);
   };
-  const OpenBanner = () => {
+  const OpenBanner = (e) => {
+    e.preventDefault();
     setopenBanner(!openBanner);
   };
-  const OpenBlog = () => {
-    setopenBlog(!openBlog);
+  const OpenRecipe = (e) => {
+    e.preventDefault();
+    setopenRecipe(!openRecipe);
   };
-  const OpenContact = () => {
+  const OpenTV = (e) => {
+    e.preventDefault();
+    setopenTV(!openTV);
+  };
+  const OpenGuide = (e) => {
+    e.preventDefault();
+    setopenGuide(!openGuide);
+  };
+  const OpenContact = (e) => {
+    e.preventDefault();
     setopenContact(!openContact);
   };
-  if(localStorage.getItem("role")){
+
+  if (localStorage.getItem("role")) {
     return (
       <>
         <AdminHelmet />
         <div class="layout-wrapper layout-content-navbar">
           <div class="layout-container">
-            {/* menu */}
             <aside
               id="layout-menu"
-              className="layout-menu menu-vertical menu bg-menu-theme"
+              className={
+                openMenu
+                  ? "layout-menu menu-vertical menu bg-menu-theme show_aside"
+                  : "layout-menu menu-vertical menu bg-menu-theme"
+              }
             >
               <div className="app-brand demo">
                 <a href="index.html" className="app-brand-link">
@@ -160,12 +201,13 @@ const AdminTemplate = () => {
                     Sneat
                   </span>
                 </a>
-                <a
-                  href="#st"
-                  className="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none"
+                <Link
+                  to=""
+                  onClick={OpenMenu}
+                  className="layout-menu-toggle menu-link text-large ms-auto d-xl-none"
                 >
                   <i className="bx bx-chevron-left bx-sm align-middle" />
-                </a>
+                </Link>
               </div>
               <div className="menu-inner-shadow" />
               <ul className="menu-inner py-1">
@@ -270,7 +312,9 @@ const AdminTemplate = () => {
                       </li>
                       <li className="menu-item">
                         <Link to="user/trash" className="menu-link">
-                          <div data-i18n="Under Maintenance">Không hoạt động</div>
+                          <div data-i18n="Under Maintenance">
+                            Không hoạt động
+                          </div>
                         </Link>
                       </li>
                     </ul>
@@ -278,7 +322,7 @@ const AdminTemplate = () => {
                 </li>
                 <li onClick={OpenSlide} className="menu-item">
                   <a href="#st" className="menu-link menu-toggle">
-                    <i class='menu-icon bx bx-slideshow'></i>
+                    <i class="menu-icon bx bx-slideshow"></i>
                     <div data-i18n="User interface">Quản lý slides</div>
                   </a>
                   {openSlide ? (
@@ -303,7 +347,7 @@ const AdminTemplate = () => {
                 </li>
                 <li onClick={OpenBanner} className="menu-item">
                   <a href="#st" className="menu-link menu-toggle">
-                    <i class='menu-icon bx bxs-rectangle'></i>
+                    <i class="menu-icon bx bxs-rectangle"></i>
                     <div data-i18n="User interface">Quản lý banners</div>
                   </a>
                   {openBanner ? (
@@ -326,32 +370,82 @@ const AdminTemplate = () => {
                     </ul>
                   ) : null}
                 </li>
-                <li onClick={OpenBlog} className="menu-item">
+                <li onClick={OpenRecipe} className="menu-item">
                   <a href="#st" className="menu-link menu-toggle">
                     <i class="menu-icon bx bxl-blogger"></i>
-                    <div data-i18n="Extended UI">Quản lý Blog</div>
+                    <div data-i18n="Extended UI">Quản lý công thức</div>
                   </a>
-                  {openBlog ? (
+                  {openRecipe ? (
                     <ul className="menu-sub">
                       <li className="menu-item">
-                        <Link to="blog/create" className="menu-link">
+                        <Link to="recipe/create" className="menu-link">
                           <div data-i18n="Perfect Scrollbar">Thêm mới</div>
                         </Link>
                       </li>
                       <li className="menu-item">
-                        <Link to="blog/list" className="menu-link">
+                        <Link to="recipe/list" className="menu-link">
                           <div data-i18n="Perfect Scrollbar">Danh sách</div>
                         </Link>
                       </li>
                       <li className="menu-item">
-                        <Link to="blog/trash" className="menu-link">
+                        <Link to="recipe/trash" className="menu-link">
                           <div data-i18n="Text Divider">Thùng rác</div>
                         </Link>
                       </li>
                     </ul>
                   ) : null}
                 </li>
-                <li onClick={OpenContact} className="menu-item">
+                <li onClick={OpenTV} className="menu-item">
+                  <a href="#st" className="menu-link menu-toggle">
+                    <i class='menu-icon bx bxl-youtube'></i>
+                    <div data-i18n="Extended UI">Quản lý LocknLockTV</div>
+                  </a>
+                  {openTV ? (
+                    <ul className="menu-sub">
+                      <li className="menu-item">
+                        <Link to="tv/create" className="menu-link">
+                          <div data-i18n="Perfect Scrollbar">Thêm mới</div>
+                        </Link>
+                      </li>
+                      <li className="menu-item">
+                        <Link to="tv/list" className="menu-link">
+                          <div data-i18n="Perfect Scrollbar">Danh sách</div>
+                        </Link>
+                      </li>
+                      <li className="menu-item">
+                        <Link to="tv/trash" className="menu-link">
+                          <div data-i18n="Text Divider">Thùng rác</div>
+                        </Link>
+                      </li>
+                    </ul>
+                  ) : null}
+                </li>
+                <li onClick={OpenGuide} className="menu-item">
+                  <a href="#st" className="menu-link menu-toggle">
+                    <i class='menu-icon bx bx-book'></i>
+                    <div data-i18n="Extended UI">Quản lý hướng dẫn</div>
+                  </a>
+                  {openGuide ? (
+                    <ul className="menu-sub">
+                      <li className="menu-item">
+                        <Link to="guide/create" className="menu-link">
+                          <div data-i18n="Perfect Scrollbar">Thêm mới</div>
+                        </Link>
+                      </li>
+                      <li className="menu-item">
+                        <Link to="guide/list" className="menu-link">
+                          <div data-i18n="Perfect Scrollbar">Danh sách</div>
+                        </Link>
+                      </li>
+                      <li className="menu-item">
+                        <Link to="guide/trash" className="menu-link">
+                          <div data-i18n="Text Divider">Thùng rác</div>
+                        </Link>
+                      </li>
+                    </ul>
+                  ) : null}
+                </li>
+                {/* <li onClick={OpenContact} className="menu-item">
                   <a href="#st" className="menu-link menu-toggle">
                     <i class="menu-icon bx bxs-contact"></i>
                     <div data-i18n="Form Elements">Quản lý liên hệ</div>
@@ -371,7 +465,7 @@ const AdminTemplate = () => {
                     </ul>
                   ) : null}
                 </li>
-  
+
                 <li className="menu-item">
                   <a href="tables-basic.html" className="menu-link">
                     <i className="menu-icon tf-icons bx bx-table" />
@@ -395,10 +489,10 @@ const AdminTemplate = () => {
                     <i className="menu-icon tf-icons bx bx-file" />
                     <div data-i18n="Documentation">Documentation</div>
                   </a>
-                </li>
+                </li> */}
               </ul>
             </aside>
-  
+
             {/* right content */}
             <div class="layout-page">
               {/* header */}
@@ -407,12 +501,13 @@ const AdminTemplate = () => {
                 id="layout-navbar"
               >
                 <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-                  <a
+                  <Link
                     className="nav-item nav-link px-0 me-xl-4"
-                    href="#st"
+                    to=""
+                    onClick={OpenMenu}
                   >
                     <i className="bx bx-menu bx-sm" />
-                  </a>
+                  </Link>
                 </div>
                 <div
                   className="navbar-nav-right d-flex align-items-center"
@@ -533,31 +628,94 @@ const AdminTemplate = () => {
                 {/* content */}
                 <Routes>
                   <Route path="" element={<Dashboard />}></Route>
-                  <Route path="category/create" element={<CreateCategory />}></Route>
-                  <Route path="category/edit/:id" element={<EditCategory/>}></Route>
-                  <Route path="category/list" element={<ListCategory />}></Route>
-                  <Route path="category/trash" element={<TrashCategory />}></Route>
-                  <Route path="product/create" element={<CreateProduct />}></Route>
-                  <Route path="product/edit/:id" element={<EditProduct/>}></Route>
+                  <Route
+                    path="category/create"
+                    element={<CreateCategory />}
+                  ></Route>
+                  <Route
+                    path="category/edit/:id"
+                    element={<EditCategory />}
+                  ></Route>
+                  <Route
+                    path="category/list"
+                    element={<ListCategory />}
+                  ></Route>
+                  <Route
+                    path="category/trash"
+                    element={<TrashCategory />}
+                  ></Route>
+                  <Route
+                    path="product/create"
+                    element={<CreateProduct />}
+                  ></Route>
+                  <Route
+                    path="product/edit/:id"
+                    element={<EditProduct />}
+                  ></Route>
                   <Route path="product/list" element={<ListProduct />}></Route>
-                  <Route path="product/trash" element={<TrashProduct />}></Route>
-                  <Route path="product/add-image/:id" element={<AddImage />}></Route>
+                  <Route
+                    path="product/trash"
+                    element={<TrashProduct />}
+                  ></Route>
+                  <Route
+                    path="product/add-image/:id"
+                    element={<AddImage />}
+                  ></Route>
                   <Route path="user/create" element={<CreateUser />}></Route>
-                  <Route path="user/edit/:id" element={<EditUser/>}></Route>
+                  <Route path="user/edit/:id" element={<EditUser />}></Route>
                   <Route path="user/list" element={<ListUser />}></Route>
                   <Route path="user/trash" element={<TrashUser />}></Route>
-                  <Route path="order/list" element={<ListOrder/>}></Route>
-                  <Route path="order/confirm" element={<ConfirmOrder/>}></Route>
-                  <Route path="order/:id" element={<DetailsOrder/>}></Route>
-                  <Route path="order/trash" element={<TrashOrder/>}></Route>
+                  <Route path="order/list" element={<ListOrder />}></Route>
+                  <Route
+                    path="order/confirm"
+                    element={<ConfirmOrder />}
+                  ></Route>
+                  <Route path="order/:id" element={<DetailsOrder />}></Route>
+                  <Route path="order/trash" element={<TrashOrder />}></Route>
                   <Route path="slide/create" element={<CreateSlide />}></Route>
-                  <Route path="slide/edit/:id" element={<EditSlide/>}></Route>
+                  <Route path="slide/edit/:id" element={<EditSlide />}></Route>
                   <Route path="slide/list" element={<ListSlide />}></Route>
                   <Route path="slide/trash" element={<TrashSlide />}></Route>
-                  <Route path="banner/create" element={<CreateBanner />}></Route>
-                  <Route path="banner/edit/:id" element={<EditBanner/>}></Route>
+                  <Route
+                    path="banner/create"
+                    element={<CreateBanner />}
+                  ></Route>
+                  <Route
+                    path="banner/edit/:id"
+                    element={<EditBanner />}
+                  ></Route>
                   <Route path="banner/list" element={<ListBanner />}></Route>
                   <Route path="banner/trash" element={<TrashBanner />}></Route>
+                  <Route
+                    path="recipe/create"
+                    element={<CreateRecipe />}
+                  ></Route>
+                  <Route
+                    path="recipe/edit/:id"
+                    element={<EditRecipe />}
+                  ></Route>
+                  <Route path="recipe/list" element={<ListRecipe />}></Route>
+                  <Route path="recipe/trash" element={<TrashRecipe />}></Route>
+                  <Route
+                    path="tv/create"
+                    element={<CreateTV />}
+                  ></Route>
+                  <Route
+                    path="tv/edit/:id"
+                    element={<EditTV />}
+                  ></Route>
+                  <Route path="tv/list" element={<ListTV />}></Route>
+                  <Route path="tv/trash" element={<TrashTV />}></Route>
+                  <Route
+                    path="guide/create"
+                    element={<CreateGuide />}
+                  ></Route>
+                  <Route
+                    path="guide/edit/:id"
+                    element={<EditGuide />}
+                  ></Route>
+                  <Route path="guide/list" element={<ListGuide />}></Route>
+                  <Route path="guide/trash" element={<TrashGuide />}></Route>
                 </Routes>
                 {/* footer */}
                 <footer className="content-footer footer bg-footer-theme">
@@ -606,7 +764,7 @@ const AdminTemplate = () => {
       </>
     );
   }
-  return <Navigate to="/login" />
+  return <Navigate to="/login" />;
 };
 
 export default AdminTemplate;

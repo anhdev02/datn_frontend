@@ -6,9 +6,13 @@ import { useMediaQuery } from 'react-responsive'
 import HeaderInfoRes from '../common/HeaderInfoRes'
 import FooterRes from '../common/FooterRes'
 import NewAddressRes from '../others/NewAddressRes'
+import { useEffect } from 'react'
 
 const NewAddressPage = () => {
   const isTablet = useMediaQuery({ maxWidth: 820 });
+  useEffect(() => {
+    document.title = 'Thêm địa chỉ';
+  }, [])
   return (
     isTablet ?
     <div id="wrap" className='displaynone_632 xans_myshop_addrlist_8631'>
